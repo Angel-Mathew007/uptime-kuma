@@ -19,7 +19,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 /* Sidebar fix */
 .sidebar {
   max-width: 100vw;
@@ -31,17 +31,39 @@ export default {
 /* Fix filter bar inside the List tab */
 .filter-bar {
   display: flex;
-  flex-wrap: wrap;        /* allow items to wrap */
-  gap: 6px;               /* spacing between wrapped items */
-  max-width: 100%;        /* never exceed screen width */
-  overflow-x: hidden;     /* prevent horizontal scroll */
+  flex-wrap: wrap;
+  gap: 6px;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
 /* Make dropdowns/search shrink instead of pushing */
 .filter-bar select,
 .filter-bar input,
 .filter-bar button {
-  flex: 1 1 auto;         /* allow them to shrink on small screens */
-  min-width: 80px;        /* prevent collapsing too much */
+  flex: 1 1 auto;
+  min-width: 80px;
+}
+
+/* Extra catch-all for small screens */
+@media (max-width: 768px) {
+  .sidebar div,
+  .list-tab div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .sidebar div select,
+  .sidebar div input,
+  .sidebar div button,
+  .list-tab div select,
+  .list-tab div input,
+  .list-tab div button {
+    flex: 1 1 auto;
+    min-width: 80px;
+  }
 }
 </style>
