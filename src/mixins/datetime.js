@@ -1,8 +1,10 @@
 import dayjs from "dayjs";
+import "dayjs/plugin/utc";
+import "dayjs/plugin/timezone";
 
 /**
  * DateTime Mixin
- * Handled timezone and format
+ * Handles timezone and localization via vue-i18n
  */
 export default {
     data() {
@@ -14,8 +16,7 @@ export default {
     methods: {
         /**
          * Convert value to UTC
-         * @param {string | number | Date | dayjs.Dayjs} value Time
-         * value to convert
+         * @param {string | number | Date | dayjs.Dayjs} value Time to convert
          * @returns {dayjs.Dayjs} Converted time
          */
         toUTC(value) {
@@ -24,104 +25,100 @@ export default {
 
         /**
          * Used for <input type="datetime" />
-         * @param {string | number | Date | dayjs.Dayjs} value Value to
-         * convert
+         * @param {string | number | Date | dayjs.Dayjs} value Value to convert
          * @returns {string} Datetime string
          */
         toDateTimeInputFormat(value) {
-            return this.datetimeFormat(value, "YYYY-MM-DDTHH:mm");
+            return this.datetimeFormat(value, { dateStyle: "short", timeStyle: "short" });
         },
 
         /**
-         * Return a given value in the format YYYY-MM-DD HH:mm:ss
-         * @param {any} value Value to format as date time
+         * Format a value in localized datetime
+         * @param {any} value Value to format
          * @returns {string} Formatted string
          */
         datetime(value) {
-            return this.datetimeFormat(value, "YYYY-MM-DD HH:mm:ss");
+            return this.datetimeFormat(value, { dateStyle: "medium", timeStyle: "short" });
         },
 
         /**
-         * Converts a Unix timestamp to a formatted date and time string.
-         * @param {number} value - The Unix timestamp to convert.
-         * @returns {string} The formatted date and time string.
+         * Converts a Unix timestamp to localized datetime
+         * @param {number} value Unix timestamp
+         * @returns {string} Localized datetime string
          */
         unixToDateTime(value) {
-            return dayjs.unix(value).tz(this.timezone).format("YYYY-MM-DD HH:mm:ss");
+            return this.datetimeFormat(new Date(value * 1000), { dateStyle: "medium", timeStyle: "short" });
         },
 
         /**
-         * Converts a Unix timestamp to a dayjs object.
-         * @param {number} value - The Unix timestamp to convert.
-         * @returns {dayjs.Dayjs} The dayjs object representing the given timestamp.
+         * Converts Unix timestamp to dayjs object
+         * @param {number} value Unix timestamp
+         * @returns {dayjs.Dayjs} dayjs object
          */
         unixToDayjs(value) {
             return dayjs.unix(value).tz(this.timezone);
         },
 
         /**
-         * Converts the given value to a dayjs object.
-         * @param {string} value - the value to be converted
-         * @returns {dayjs.Dayjs} a dayjs object in the timezone of this instance
+         * Converts a value to dayjs object with timezone
+         * @param {string} value
+         * @returns {dayjs.Dayjs}
          */
         toDayjs(value) {
             return dayjs.utc(value).tz(this.timezone);
         },
 
         /**
-         * Get time for maintenance
-         * @param {string | number | Date | dayjs.Dayjs} value Time to
-         * format
-         * @returns {string} Formatted string
+         * Format maintenance time with conditional format
+         * @param {any} value
+         * @returns {string}
          */
         datetimeMaintenance(value) {
             const inputDate = new Date(value);
             const now = new Date(Date.now());
 
-            if (inputDate.getFullYear() === now.getUTCFullYear() && inputDate.getMonth() === now.getUTCMonth() && inputDate.getDay() === now.getUTCDay()) {
-                return this.datetimeFormat(value, "HH:mm");
+            if (
+                inputDate.getFullYear() === now.getUTCFullYear() &&
+                inputDate.getMonth() === now.getUTCMonth() &&
+                inputDate.getDate() === now.getUTCDate()
+            ) {
+                return this.datetimeFormat(value, { timeStyle: "short" });
             } else {
-                return this.datetimeFormat(value, "YYYY-MM-DD HH:mm");
+                return this.datetimeFormat(value, { dateStyle: "short", timeStyle: "short" });
             }
         },
 
         /**
-         * Return a given value in the format YYYY-MM-DD
-         * @param {any} value  Value to format as date
-         * @returns {string} Formatted string
+         * Format date only
+         * @param {any} value
+         * @returns {string}
          */
         date(value) {
-            return this.datetimeFormat(value, "YYYY-MM-DD");
+            return this.datetimeFormat(value, { dateStyle: "medium" });
         },
 
         /**
-         * Return a given value in the format HH:mm or if second is set
-         * to true, HH:mm:ss
-         * @param {any} value Value to format
-         * @param {boolean} second Should seconds be included?
-         * @returns {string} Formatted string
+         * Format time only
+         * @param {any} value
+         * @param {boolean} includeSeconds
+         * @returns {string}
          */
-        time(value, second = true) {
-            let secondString;
-            if (second) {
-                secondString = ":ss";
-            } else {
-                secondString = "";
-            }
-            return this.datetimeFormat(value, "HH:mm" + secondString);
+        time(value, includeSeconds = true) {
+            const options = includeSeconds
+                ? { hour: "2-digit", minute: "2-digit", second: "2-digit" }
+                : { hour: "2-digit", minute: "2-digit" };
+            return this.datetimeFormat(value, options);
         },
 
         /**
-         * Return a value in a custom format
-         * @param {any} value Value to format
-         * @param {any} format Format to return value in
-         * @returns {string} Formatted string
+         * Main datetime formatter using vue-i18n
+         * @param {any} value
+         * @param {Object} options Intl.DateTimeFormat options
+         * @returns {string}
          */
-        datetimeFormat(value, format) {
-            if (value !== undefined && value !== "") {
-                return dayjs.utc(value).tz(this.timezone).format(format);
-            }
-            return "";
+        datetimeFormat(value, options = { dateStyle: "medium", timeStyle: "short" }) {
+            if (!value) return "";
+            return this.$d(new Date(value), options);
         },
     },
 
@@ -130,9 +127,7 @@ export default {
             if (this.userTimezone === "auto") {
                 return dayjs.tz.guess();
             }
-
             return this.userTimezone;
         },
-    }
-
+    },
 };

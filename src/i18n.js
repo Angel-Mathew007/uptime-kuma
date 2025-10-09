@@ -1,108 +1,66 @@
-import { createI18n } from "vue-i18n/dist/vue-i18n.esm-browser.prod.js";
-import en from "./lang/en.json";
+import "bootstrap";
+import { createApp, h } from "vue";
+import contenteditable from "vue-contenteditable";
+import Toast from "vue-toastification";
+import "vue-toastification/dist/index.css";
+import App from "./App.vue";
+import "./assets/app.scss";
+import "./assets/vue-datepicker.scss";
 
-const languageList = {
-    "ar-SY": "العربية",
-    "cs-CZ": "Čeština",
-    "zh-HK": "繁體中文 (香港)",
-    "bg-BG": "Български",
-    "be": "Беларуская",
-    "de-DE": "Deutsch (Deutschland)",
-    "de-CH": "Deutsch (Schweiz)",
-    "nl-NL": "Nederlands",
-    "nb-NO": "Norsk",
-    "es-ES": "Español",
-    "eu": "Euskara",
-    "fa": "Farsi",
-    "pt-PT": "Português (Portugal)",
-    "pt-BR": "Português (Brasileiro)",
-    "fi": "Suomi",
-    "fr-FR": "Français (France)",
-    "he-IL": "עברית",
-    "hu": "Magyar",
-    "hr-HR": "Hrvatski",
-    "it-IT": "Italiano (Italian)",
-    "id-ID": "Bahasa Indonesia (Indonesian)",
-    "ja": "日本語",
-    "da-DK": "Danish (Danmark)",
-    "sr": "Српски",
-    "sl-SI": "Slovenščina",
-    "sr-latn": "Srpski",
-    "sv-SE": "Svenska",
-    "tr-TR": "Türkçe",
-    "ko-KR": "한국어",
-    "lt": "Lietuvių",
-    "ru-RU": "Русский",
-    "zh-CN": "简体中文",
-    "pl": "Polski",
-    "et-EE": "eesti",
-    "vi-VN": "Tiếng Việt",
-    "zh-TW": "繁體中文 (台灣)",
-    "uk-UA": "Українська",
-    "th-TH": "ไทย",
-    "el-GR": "Ελληνικά",
-    "yue": "繁體中文 (廣東話 / 粵語)",
-    "ro": "Limba română",
-    "ur": "Urdu",
-    "ge": "ქართული",
-    "uz": "O'zbek tili",
-    "ga": "Gaeilge",
-    "sk": "Slovenčina",
-};
+// i18n
+import { i18n } from "./i18n";
 
-let messages = {
-    en,
-};
+// Mixins
+import datetime from "./mixins/datetime";
+import mobile from "./mixins/mobile";
+import publicMixin from "./mixins/public";
+import socket from "./mixins/socket";
+import theme from "./mixins/theme";
+import lang from "./mixins/lang";
 
-for (let lang in languageList) {
-    messages[lang] = {
-        languageName: languageList[lang]
-    };
-}
+// Router & Utilities
+import { router } from "./router";
+import { appName } from "./util.ts";
+import { loadToastSettings } from "./util-frontend";
 
-const rtlLangs = [ "he-IL", "fa", "ar-SY", "ur" ];
+// Day.js & plugins
+import dayjs from "dayjs";
+import timezone from "./modules/dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+import relativeTime from "dayjs/plugin/relativeTime";
 
-/**
- * Find the best matching locale to display
- * If no locale can be matched, the default is "en"
- * @returns {string} the locale that should be displayed
- */
-export function currentLocale() {
-    for (const locale of [ localStorage.locale, navigator.language, ...navigator.languages ]) {
-        // localstorage might not have a value or there might not be a language in `navigator.language`
-        if (!locale) {
-            continue;
-        }
-        if (locale in messages) {
-            return locale;
-        }
-        // If the locale is a 2-letter code, we can try to find a regional variant
-        // e.g. "fr" may not be in the messages, but "fr-FR" is
-        if (locale.length === 2) {
-            const regionalLocale = `${locale}-${locale.toUpperCase()}`;
-            if (regionalLocale in messages) {
-                return regionalLocale;
-            }
-        } else {
-            // Some locales are further specified such as "en-US".
-            // If we only have a generic locale for this, we can use it too
-            const genericLocale = locale.slice(0, 2);
-            if (genericLocale in messages) {
-                return genericLocale;
-            }
-        }
-    }
-    return "en";
-}
+// Extend Day.js with plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
+dayjs.extend(relativeTime);
 
-export const localeDirection = () => {
-    return rtlLangs.includes(currentLocale()) ? "rtl" : "ltr";
-};
-
-export const i18n = createI18n({
-    locale: currentLocale(),
-    fallbackLocale: "en",
-    silentFallbackWarn: true,
-    silentTranslationWarn: true,
-    messages: messages,
+// Create Vue app
+const app = createApp({
+    mixins: [socket, theme, mobile, datetime, publicMixin, lang],
+    data() {
+        return {
+            appName: appName,
+        };
+    },
+    render: () => h(App),
 });
+
+// Use router and i18n
+app.use(router);
+app.use(i18n);
+
+// Use Toast with settings
+app.use(Toast, loadToastSettings());
+
+// Register global components
+app.component("Editable", contenteditable);
+app.component("FontAwesomeIcon", () => import("./icon.js"));
+
+// Mount the app
+app.mount("#app");
+
+// Expose the Vue instance in development
+if (process.env.NODE_ENV === "development") {
+    console.log("Dev Only: window.app is the vue instance");
+    window.app = app._instance;
+}
