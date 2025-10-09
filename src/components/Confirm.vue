@@ -6,16 +6,32 @@
                     <h5 id="exampleModalLabel" class="modal-title">
                         {{ title || $t("Confirm") }}
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                    />
                 </div>
                 <div class="modal-body">
                     <slot />
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn" :class="btnStyle" data-bs-dismiss="modal" @click="yes">
+                    <button
+                        type="button"
+                        class="btn"
+                        :class="btnStyle"
+                        data-bs-dismiss="modal"
+                        @click="yes"
+                    >
                         {{ yesText }}
                     </button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @click="no">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                        @click="no"
+                    >
                         {{ noText }}
                     </button>
                 </div>
@@ -37,7 +53,7 @@ export default {
         /** Text to use as yes */
         yesText: {
             type: String,
-            default: "Yes",     // TODO: No idea what to translate this
+            default: "Yes", // TODO: No idea what to translate this
         },
         /** Text to use as no */
         noText: {
@@ -48,9 +64,9 @@ export default {
         title: {
             type: String,
             default: null,
-        }
+        },
     },
-    emits: [ "yes", "no" ],
+    emits: ["yes", "no"],
     data: () => ({
         modal: null,
     }),
@@ -78,7 +94,7 @@ export default {
          */
         no() {
             this.$emit("no");
-        }
+        },
     },
 };
 </script>

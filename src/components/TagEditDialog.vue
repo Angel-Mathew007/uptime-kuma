@@ -1,32 +1,46 @@
 <template>
     <form @submit.prevent="submit">
-        <div ref="modal" class="modal fade" tabindex="-1" data-bs-backdrop="static">
+        <div
+            ref="modal"
+            class="modal fade"
+            tabindex="-1"
+            data-bs-backdrop="static"
+        >
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 id="exampleModalLabel" class="modal-title">
                             {{ $t("Edit Tag") }}
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        />
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="tag-name" class="form-label">{{ $t("Name") }}</label>
+                            <label for="tag-name" class="form-label">{{
+                                $t("Name")
+                            }}</label>
                             <input
                                 id="tag-name"
                                 v-model="tag.name"
                                 type="text"
                                 class="form-control"
-                                :class="{'is-invalid': nameInvalid}"
+                                :class="{ 'is-invalid': nameInvalid }"
                                 required
-                            >
+                            />
                             <div class="invalid-feedback">
                                 {{ $t("Tag with this name already exist.") }}
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="tag-color" class="form-label">{{ $t("color") }}</label>
+                            <label for="tag-color" class="form-label">{{
+                                $t("color")
+                            }}</label>
                             <div class="d-flex">
                                 <div class="col-8 pe-1">
                                     <vue-multiselect
@@ -43,8 +57,15 @@
                                         <template #option="{ option }">
                                             <div
                                                 class="mx-2 py-1 px-3 rounded d-inline-flex"
-                                                style="height: 24px; color: white;"
-                                                :style="{ backgroundColor: option.color + ' !important' }"
+                                                style="
+                                                    height: 24px;
+                                                    color: white;
+                                                "
+                                                :style="{
+                                                    backgroundColor:
+                                                        option.color +
+                                                        ' !important',
+                                                }"
                                             >
                                                 <span>{{ option.name }}</span>
                                             </div>
@@ -52,8 +73,15 @@
                                         <template #singleLabel="{ option }">
                                             <div
                                                 class="py-1 px-3 rounded d-inline-flex"
-                                                style="height: 24px; color: white;"
-                                                :style="{ backgroundColor: option.color + ' !important' }"
+                                                style="
+                                                    height: 24px;
+                                                    color: white;
+                                                "
+                                                :style="{
+                                                    backgroundColor:
+                                                        option.color +
+                                                        ' !important',
+                                                }"
                                             >
                                                 <span>{{ option.name }}</span>
                                             </div>
@@ -61,23 +89,47 @@
                                     </vue-multiselect>
                                 </div>
                                 <div class="col-4 ps-1">
-                                    <input id="tag-color-hex" v-model="tag.color" type="text" class="form-control">
+                                    <input
+                                        id="tag-color-hex"
+                                        v-model="tag.color"
+                                        type="text"
+                                        class="form-control"
+                                    />
                                 </div>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="tag-monitors" class="form-label">{{ $tc("Monitor", selectedMonitors.length) }}</label>
+                            <label for="tag-monitors" class="form-label">{{
+                                $tc("Monitor", selectedMonitors.length)
+                            }}</label>
                             <div class="tag-monitors-list">
-                                <router-link v-for="monitor in selectedMonitors" :key="monitor.id" class="d-flex align-items-center justify-content-between text-decoration-none tag-monitors-list-row py-2 px-3" :to="monitorURL(monitor.id)" @click="modal.hide()">
+                                <router-link
+                                    v-for="monitor in selectedMonitors"
+                                    :key="monitor.id"
+                                    class="d-flex align-items-center justify-content-between text-decoration-none tag-monitors-list-row py-2 px-3"
+                                    :to="monitorURL(monitor.id)"
+                                    @click="modal.hide()"
+                                >
                                     <span>{{ monitor.name }}</span>
-                                    <button type="button" class="btn-rm-monitor btn btn-outline-danger ms-2 py-1" @click.stop.prevent="removeMonitor(monitor.id)">
-                                        <font-awesome-icon class="" icon="times" />
+                                    <button
+                                        type="button"
+                                        class="btn-rm-monitor btn btn-outline-danger ms-2 py-1"
+                                        @click.stop.prevent="
+                                            removeMonitor(monitor.id)
+                                        "
+                                    >
+                                        <font-awesome-icon
+                                            class=""
+                                            icon="times"
+                                        />
                                     </button>
                                 </router-link>
                             </div>
                             <div v-if="allMonitorList.length > 0" class="pt-3">
-                                <label class="form-label">{{ $t("Add a monitor") }}:</label>
+                                <label class="form-label"
+                                    >{{ $t("Add a monitor") }}:</label
+                                >
                                 <VueMultiselect
                                     v-model="selectedAddMonitor"
                                     :options="allMonitorList"
@@ -90,7 +142,14 @@
                                 >
                                     <template #option="{ option }">
                                         <div class="d-inline-flex">
-                                            <span>{{ option.name }} <Tag v-for="monitorTag in option.tags" :key="monitorTag" :item="monitorTag" :size="'sm'" /></span>
+                                            <span
+                                                >{{ option.name }}
+                                                <Tag
+                                                    v-for="monitorTag in option.tags"
+                                                    :key="monitorTag"
+                                                    :item="monitorTag"
+                                                    :size="'sm'"
+                                            /></span>
                                         </div>
                                     </template>
                                 </VueMultiselect>
@@ -99,11 +158,24 @@
                     </div>
 
                     <div class="modal-footer">
-                        <button v-if="tag && tag.id !== null" type="button" class="btn btn-danger" :disabled="processing" @click="deleteConfirm">
+                        <button
+                            v-if="tag && tag.id !== null"
+                            type="button"
+                            class="btn btn-danger"
+                            :disabled="processing"
+                            @click="deleteConfirm"
+                        >
                             {{ $t("Delete") }}
                         </button>
-                        <button type="submit" class="btn btn-primary" :disabled="processing">
-                            <div v-if="processing" class="spinner-border spinner-border-sm me-1"></div>
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            :disabled="processing"
+                        >
+                            <div
+                                v-if="processing"
+                                class="spinner-border spinner-border-sm me-1"
+                            ></div>
                             {{ $t("Save") }}
                         </button>
                     </div>
@@ -112,7 +184,13 @@
         </div>
     </form>
 
-    <Confirm ref="confirmDelete" btn-style="btn-danger" :yes-text="$t('Yes')" :no-text="$t('No')" @yes="deleteTag">
+    <Confirm
+        ref="confirmDelete"
+        btn-style="btn-danger"
+        :yes-text="$t('Yes')"
+        :no-text="$t('No')"
+        @yes="deleteTag"
+    >
         {{ $t("confirmDeleteTagMsg") }}
     </Confirm>
 </template>
@@ -165,30 +243,44 @@ export default {
 
     computed: {
         colorOptions() {
-            if (!colorOptions(this).find(option => option.color === this.tag.color)) {
-                return colorOptions(this).concat(
-                    {
-                        name: "custom",
-                        color: this.tag.color
-                    });
+            if (
+                !colorOptions(this).find(
+                    (option) => option.color === this.tag.color,
+                )
+            ) {
+                return colorOptions(this).concat({
+                    name: "custom",
+                    color: this.tag.color,
+                });
             } else {
                 return colorOptions(this);
             }
         },
         selectedMonitors() {
             return this.monitors
-                .concat(Object.values(this.$root.monitorList).filter(monitor => this.addingMonitor.includes(monitor.id)))
-                .filter(monitor => !this.removingMonitor.includes(monitor.id));
+                .concat(
+                    Object.values(this.$root.monitorList).filter((monitor) =>
+                        this.addingMonitor.includes(monitor.id),
+                    ),
+                )
+                .filter(
+                    (monitor) => !this.removingMonitor.includes(monitor.id),
+                );
         },
         allMonitorList() {
-            return Object.values(this.$root.monitorList).filter(monitor => !this.selectedMonitors.includes(monitor));
+            return Object.values(this.$root.monitorList).filter(
+                (monitor) => !this.selectedMonitors.includes(monitor),
+            );
         },
     },
 
     watch: {
         // Set color option to "Custom" when a unknown color is entered
         "tag.color"(to, from) {
-            if (to !== "" && colorOptions(this).find(x => x.color === to) == null) {
+            if (
+                to !== "" &&
+                colorOptions(this).find((x) => x.color === to) == null
+            ) {
                 this.selectedColor.name = this.$t("Custom");
                 this.selectedColor.color = to;
             }
@@ -211,7 +303,9 @@ export default {
         selectedAddMonitor(monitor) {
             if (monitor) {
                 if (this.removingMonitor.includes(monitor.id)) {
-                    this.removingMonitor = this.removingMonitor.filter(id => id !== monitor.id);
+                    this.removingMonitor = this.removingMonitor.filter(
+                        (id) => id !== monitor.id,
+                    );
                 } else {
                     this.addingMonitor.push(monitor.id);
                 }
@@ -255,7 +349,9 @@ export default {
          */
         validate() {
             this.nameInvalid = false;
-            const sameName = this.existingTags.find((existingTag) => existingTag.name === this.tag.name);
+            const sameName = this.existingTags.find(
+                (existingTag) => existingTag.name === this.tag.name,
+            );
             if (sameName != null && sameName.id !== this.tag.id) {
                 this.nameInvalid = true;
                 return false;
@@ -270,9 +366,11 @@ export default {
          */
         show(tag) {
             if (tag) {
-                this.selectedColor = this.colorOptions.find(x => x.color === tag.color) ?? {
+                this.selectedColor = this.colorOptions.find(
+                    (x) => x.color === tag.color,
+                ) ?? {
                     name: this.$t("Custom"),
-                    color: tag.color
+                    color: tag.color,
                 };
                 this.tag.id = tag.id;
                 this.tag.name = tag.name;
@@ -316,23 +414,31 @@ export default {
             }
 
             for (let addId of this.addingMonitor) {
-                await this.addMonitorTagAsync(this.tag.id, addId, "").then((res) => {
-                    if (!res.ok) {
-                        this.$root.toastError(res.msg);
-                        editResult = false;
-                    }
-                });
-            }
-
-            for (let removeId of this.removingMonitor) {
-                this.monitors.find(monitor => monitor.id === removeId)?.tags.forEach(async (monitorTag) => {
-                    await this.deleteMonitorTagAsync(this.tag.id, removeId, monitorTag.value).then((res) => {
+                await this.addMonitorTagAsync(this.tag.id, addId, "").then(
+                    (res) => {
                         if (!res.ok) {
                             this.$root.toastError(res.msg);
                             editResult = false;
                         }
+                    },
+                );
+            }
+
+            for (let removeId of this.removingMonitor) {
+                this.monitors
+                    .find((monitor) => monitor.id === removeId)
+                    ?.tags.forEach(async (monitorTag) => {
+                        await this.deleteMonitorTagAsync(
+                            this.tag.id,
+                            removeId,
+                            monitorTag.value,
+                        ).then((res) => {
+                            if (!res.ok) {
+                                this.$root.toastError(res.msg);
+                                editResult = false;
+                            }
+                        });
                     });
-                });
             }
 
             this.$root.getSocket().emit("editTag", this.tag, (res) => {
@@ -370,7 +476,7 @@ export default {
          */
         removeMonitor(id) {
             if (this.addingMonitor.includes(id)) {
-                this.addingMonitor = this.addingMonitor.filter(x => x !== id);
+                this.addingMonitor = this.addingMonitor.filter((x) => x !== id);
             } else {
                 this.removingMonitor.push(id);
             }
@@ -383,7 +489,9 @@ export default {
          */
         monitorsByTag(tagId) {
             return Object.values(this.$root.monitorList).filter((monitor) => {
-                return monitor.tags.find(monitorTag => monitorTag.tag_id === tagId);
+                return monitor.tags.find(
+                    (monitorTag) => monitorTag.tag_id === tagId,
+                );
             });
         },
 
@@ -427,7 +535,9 @@ export default {
          */
         addMonitorTagAsync(tagId, monitorId, value) {
             return new Promise((resolve) => {
-                this.$root.getSocket().emit("addMonitorTag", tagId, monitorId, value, resolve);
+                this.$root
+                    .getSocket()
+                    .emit("addMonitorTag", tagId, monitorId, value, resolve);
             });
         },
         /**
@@ -439,7 +549,9 @@ export default {
          */
         deleteMonitorTagAsync(tagId, monitorId, value) {
             return new Promise((resolve) => {
-                this.$root.getSocket().emit("deleteMonitorTag", tagId, monitorId, value, resolve);
+                this.$root
+                    .getSocket()
+                    .emit("deleteMonitorTag", tagId, monitorId, value, resolve);
             });
         },
     },
@@ -450,7 +562,8 @@ export default {
 @import "../assets/vars.scss";
 
 .dark {
-    .modal-dialog .form-text, .modal-dialog p {
+    .modal-dialog .form-text,
+    .modal-dialog p {
         color: $dark-font-color;
     }
 }
@@ -481,5 +594,4 @@ export default {
         background-color: $dark-bg2;
     }
 }
-
 </style>

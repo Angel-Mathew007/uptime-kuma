@@ -2,7 +2,12 @@
     <div class="shadow-box mb-3" :style="boxStyle">
         <div class="list-header">
             <div class="header-top">
-                <button class="btn btn-outline-normal ms-2" :class="{ 'active': selectMode }" type="button" @click="selectMode = !selectMode">
+                <button
+                    class="btn btn-outline-normal ms-2"
+                    :class="{ active: selectMode }"
+                    type="button"
+                    @click="selectMode = !selectMode"
+                >
                     {{ $t("Select") }}
                 </button>
 
@@ -11,7 +16,11 @@
                     <a v-if="searchText == ''" class="search-icon">
                         <font-awesome-icon icon="search" />
                     </a>
-                    <a v-if="searchText != ''" class="search-icon" @click="clearSearchText">
+                    <a
+                        v-if="searchText != ''"
+                        class="search-icon"
+                        @click="clearSearchText"
+                    >
                         <font-awesome-icon icon="times" />
                     </a>
                     <form>
@@ -26,7 +35,10 @@
                 </div>
             </div>
             <div class="header-filter">
-                <MonitorListFilter :filterState="filterState" @update-filter="updateFilter" />
+                <MonitorListFilter
+                    :filterState="filterState"
+                    @update-filter="updateFilter"
+                />
             </div>
 
             <!-- Selection Controls -->
@@ -37,17 +49,33 @@
                     type="checkbox"
                 />
 
-                <button class="btn-outline-normal" @click="pauseDialog"><font-awesome-icon icon="pause" size="sm" /> {{ $t("Pause") }}</button>
-                <button class="btn-outline-normal" @click="resumeSelected"><font-awesome-icon icon="play" size="sm" /> {{ $t("Resume") }}</button>
+                <button class="btn-outline-normal" @click="pauseDialog">
+                    <font-awesome-icon icon="pause" size="sm" />
+                    {{ $t("Pause") }}
+                </button>
+                <button class="btn-outline-normal" @click="resumeSelected">
+                    <font-awesome-icon icon="play" size="sm" />
+                    {{ $t("Resume") }}
+                </button>
 
                 <span v-if="selectedMonitorCount > 0">
-                    {{ $t("selectedMonitorCount", [ selectedMonitorCount ]) }}
+                    {{ $t("selectedMonitorCount", [selectedMonitorCount]) }}
                 </span>
             </div>
         </div>
-        <div ref="monitorList" class="monitor-list" :class="{ scrollbar: scrollbar }" :style="monitorListStyle" data-testid="monitor-list">
-            <div v-if="Object.keys($root.monitorList).length === 0" class="text-center mt-3">
-                {{ $t("No Monitors, please") }} <router-link to="/add">{{ $t("add one") }}</router-link>
+        <div
+            ref="monitorList"
+            class="monitor-list"
+            :class="{ scrollbar: scrollbar }"
+            :style="monitorListStyle"
+            data-testid="monitor-list"
+        >
+            <div
+                v-if="Object.keys($root.monitorList).length === 0"
+                class="text-center mt-3"
+            >
+                {{ $t("No Monitors, please") }}
+                <router-link to="/add">{{ $t("add one") }}</router-link>
             </div>
 
             <MonitorListItem
@@ -64,7 +92,12 @@
         </div>
     </div>
 
-    <Confirm ref="confirmPause" :yes-text="$t('Yes')" :no-text="$t('No')" @yes="pauseSelected">
+    <Confirm
+        ref="confirmPause"
+        :yes-text="$t('Yes')"
+        :no-text="$t('No')"
+        @yes="pauseSelected"
+    >
         {{ $t("pauseMonitorMsg") }}
     </Confirm>
 </template>
@@ -99,7 +132,7 @@ export default {
                 status: null,
                 active: null,
                 tags: null,
-            }
+            },
         };
     },
     computed: {
@@ -119,7 +152,6 @@ export default {
                     height: "calc(100vh - 160px)",
                 };
             }
-
         },
 
         /**
@@ -129,7 +161,7 @@ export default {
         sortedMonitorList() {
             let result = Object.values(this.$root.monitorList);
 
-            result = result.filter(monitor => {
+            result = result.filter((monitor) => {
                 // The root list does not show children
                 if (monitor.parent !== null) {
                     return false;
@@ -156,7 +188,7 @@ export default {
             }
 
             return {
-                "height": `calc(100% - ${listHeaderHeight}px)`
+                height: `calc(100% - ${listHeaderHeight}px)`,
             };
         },
 
@@ -169,8 +201,13 @@ export default {
          * @returns {boolean} True if any filter is active, false otherwise.
          */
         filtersActive() {
-            return this.filterState.status != null || this.filterState.active != null || this.filterState.tags != null || this.searchText !== "";
-        }
+            return (
+                this.filterState.status != null ||
+                this.filterState.active != null ||
+                this.filterState.tags != null ||
+                this.searchText !== ""
+            );
+        },
     },
     watch: {
         searchText() {
@@ -290,8 +327,10 @@ export default {
          */
         pauseSelected() {
             Object.keys(this.selectedMonitors)
-                .filter(id => this.$root.monitorList[id].active)
-                .forEach(id => this.$root.getSocket().emit("pauseMonitor", id, () => {}));
+                .filter((id) => this.$root.monitorList[id].active)
+                .forEach((id) =>
+                    this.$root.getSocket().emit("pauseMonitor", id, () => {}),
+                );
 
             this.cancelSelectMode();
         },
@@ -301,8 +340,10 @@ export default {
          */
         resumeSelected() {
             Object.keys(this.selectedMonitors)
-                .filter(id => !this.$root.monitorList[id].active)
-                .forEach(id => this.$root.getSocket().emit("resumeMonitor", id, () => {}));
+                .filter((id) => !this.$root.monitorList[id].active)
+                .forEach((id) =>
+                    this.$root.getSocket().emit("resumeMonitor", id, () => {}),
+                );
 
             this.cancelSelectMode();
         },
@@ -314,8 +355,14 @@ export default {
         filterFunc(monitor) {
             // Group monitors bypass filter if at least 1 of children matched
             if (monitor.type === "group") {
-                const children = Object.values(this.$root.monitorList).filter(m => m.parent === monitor.id);
-                if (children.some((child, index, children) => this.filterFunc(child))) {
+                const children = Object.values(this.$root.monitorList).filter(
+                    (m) => m.parent === monitor.id,
+                );
+                if (
+                    children.some((child, index, children) =>
+                        this.filterFunc(child),
+                    )
+                ) {
                     return true;
                 }
             }
@@ -326,32 +373,55 @@ export default {
             if (this.searchText !== "") {
                 const loweredSearchText = this.searchText.toLowerCase();
                 searchTextMatch =
-                    monitor.name.toLowerCase().includes(loweredSearchText)
-                    || monitor.tags.find(tag => tag.name.toLowerCase().includes(loweredSearchText)
-                        || tag.value?.toLowerCase().includes(loweredSearchText));
+                    monitor.name.toLowerCase().includes(loweredSearchText) ||
+                    monitor.tags.find(
+                        (tag) =>
+                            tag.name
+                                .toLowerCase()
+                                .includes(loweredSearchText) ||
+                            tag.value
+                                ?.toLowerCase()
+                                .includes(loweredSearchText),
+                    );
             }
 
             // filter by status
             let statusMatch = true;
-            if (this.filterState.status != null && this.filterState.status.length > 0) {
-                if (monitor.id in this.$root.lastHeartbeatList && this.$root.lastHeartbeatList[monitor.id]) {
-                    monitor.status = this.$root.lastHeartbeatList[monitor.id].status;
+            if (
+                this.filterState.status != null &&
+                this.filterState.status.length > 0
+            ) {
+                if (
+                    monitor.id in this.$root.lastHeartbeatList &&
+                    this.$root.lastHeartbeatList[monitor.id]
+                ) {
+                    monitor.status =
+                        this.$root.lastHeartbeatList[monitor.id].status;
                 }
                 statusMatch = this.filterState.status.includes(monitor.status);
             }
 
             // filter by active
             let activeMatch = true;
-            if (this.filterState.active != null && this.filterState.active.length > 0) {
+            if (
+                this.filterState.active != null &&
+                this.filterState.active.length > 0
+            ) {
                 activeMatch = this.filterState.active.includes(monitor.active);
             }
 
             // filter by tags
             let tagsMatch = true;
-            if (this.filterState.tags != null && this.filterState.tags.length > 0) {
-                tagsMatch = monitor.tags.map(tag => tag.tag_id) // convert to array of tag IDs
-                    .filter(monitorTagId => this.filterState.tags.includes(monitorTagId)) // perform Array Intersaction between filter and monitor's tags
-                    .length > 0;
+            if (
+                this.filterState.tags != null &&
+                this.filterState.tags.length > 0
+            ) {
+                tagsMatch =
+                    monitor.tags
+                        .map((tag) => tag.tag_id) // convert to array of tag IDs
+                        .filter((monitorTagId) =>
+                            this.filterState.tags.includes(monitorTagId),
+                        ).length > 0; // perform Array Intersaction between filter and monitor's tags
             }
 
             return searchTextMatch && statusMatch && activeMatch && tagsMatch;
@@ -384,7 +454,7 @@ export default {
             }
 
             return m1.name.localeCompare(m2.name);
-        }
+        },
     },
 };
 </script>

@@ -25,12 +25,24 @@ class PagerDuty extends NotificationProvider {
                 const title = "Uptime Kuma Monitor ✅ Up";
                 const eventAction = notification.pagerdutyAutoResolve || null;
 
-                return this.postNotification(notification, title, heartbeatJSON.msg, monitorJSON, eventAction);
+                return this.postNotification(
+                    notification,
+                    title,
+                    heartbeatJSON.msg,
+                    monitorJSON,
+                    eventAction,
+                );
             }
 
             if (heartbeatJSON.status === DOWN) {
                 const title = "Uptime Kuma Monitor 🔴 Down";
-                return this.postNotification(notification, title, heartbeatJSON.msg, monitorJSON, "trigger");
+                return this.postNotification(
+                    notification,
+                    title,
+                    heartbeatJSON.msg,
+                    monitorJSON,
+                    "trigger",
+                );
             }
         } catch (error) {
             this.throwGeneralAxiosError(error);
@@ -45,10 +57,15 @@ class PagerDuty extends NotificationProvider {
      */
     checkResult(result) {
         if (result.status == null) {
-            throw new Error("PagerDuty notification failed with invalid response!");
+            throw new Error(
+                "PagerDuty notification failed with invalid response!",
+            );
         }
         if (result.status < 200 || result.status >= 300) {
-            throw new Error("PagerDuty notification failed with status code " + result.status);
+            throw new Error(
+                "PagerDuty notification failed with status code " +
+                    result.status,
+            );
         }
     }
 
@@ -61,8 +78,13 @@ class PagerDuty extends NotificationProvider {
      * @param {?string} eventAction Action event for PagerDuty (trigger, acknowledge, resolve)
      * @returns {Promise<string>} Success message
      */
-    async postNotification(notification, title, body, monitorInfo, eventAction = "trigger") {
-
+    async postNotification(
+        notification,
+        title,
+        body,
+        monitorInfo,
+        eventAction = "trigger",
+    ) {
         if (eventAction == null) {
             return "No action required";
         }
@@ -92,13 +114,14 @@ class PagerDuty extends NotificationProvider {
                 routing_key: notification.pagerdutyIntegrationKey,
                 event_action: eventAction,
                 dedup_key: "Uptime Kuma/" + monitorInfo.id,
-            }
+            },
         };
 
         const baseURL = await setting("primaryBaseURL");
         if (baseURL && monitorInfo) {
             options.client = "Uptime Kuma";
-            options.client_url = baseURL + getMonitorRelativeURL(monitorInfo.id);
+            options.client_url =
+                baseURL + getMonitorRelativeURL(monitorInfo.id);
         }
 
         let result = await axios.request(options);

@@ -50,15 +50,20 @@ class SetupDatabase {
             dbConfig = Database.readDBConfig();
             log.debug("setup-database", "db-config.json is found and is valid");
             this.needSetup = false;
-
         } catch (e) {
-            log.info("setup-database", "db-config.json is not found or invalid: " + e.message);
+            log.info(
+                "setup-database",
+                "db-config.json is not found or invalid: " + e.message,
+            );
 
             // Check if kuma.db is found (1.X.X users), generate db-config.json
             if (fs.existsSync(path.join(Database.dataDir, "kuma.db"))) {
                 this.needSetup = false;
 
-                log.info("setup-database", "kuma.db is found, generate db-config.json");
+                log.info(
+                    "setup-database",
+                    "kuma.db is found, generate db-config.json",
+                );
                 Database.writeDBConfig({
                     type: "sqlite",
                 });
@@ -70,7 +75,10 @@ class SetupDatabase {
 
         if (process.env.UPTIME_KUMA_DB_TYPE) {
             this.needSetup = false;
-            log.info("setup-database", "UPTIME_KUMA_DB_TYPE is provided by env, try to override db-config.json");
+            log.info(
+                "setup-database",
+                "UPTIME_KUMA_DB_TYPE is provided by env, try to override db-config.json",
+            );
             dbConfig.type = process.env.UPTIME_KUMA_DB_TYPE;
             dbConfig.hostname = process.env.UPTIME_KUMA_DB_HOSTNAME;
             dbConfig.port = process.env.UPTIME_KUMA_DB_PORT;
@@ -79,7 +87,6 @@ class SetupDatabase {
             dbConfig.password = process.env.UPTIME_KUMA_DB_PASSWORD;
             Database.writeDBConfig(dbConfig);
         }
-
     }
 
     /**
@@ -149,7 +156,7 @@ class SetupDatabase {
 
                 let dbConfig = request.body.dbConfig;
 
-                let supportedDBTypes = [ "mariadb", "sqlite" ];
+                let supportedDBTypes = ["mariadb", "sqlite"];
 
                 if (this.isEnabledEmbeddedMariaDB()) {
                     supportedDBTypes.push("embedded-mariadb");
@@ -208,7 +215,10 @@ class SetupDatabase {
 
                     // Test connection
                     try {
-                        log.info("setup-database", "Testing database connection...");
+                        log.info(
+                            "setup-database",
+                            "Testing database connection...",
+                        );
                         const connection = await mysql.createConnection({
                             host: dbConfig.hostname,
                             port: dbConfig.port,
@@ -219,7 +229,11 @@ class SetupDatabase {
                         await connection.execute("SELECT 1");
                         connection.end();
                     } catch (e) {
-                        response.status(400).json("Cannot connect to the database: " + e.message);
+                        response
+                            .status(400)
+                            .json(
+                                "Cannot connect to the database: " + e.message,
+                            );
                         this.runningSetup = false;
                         return;
                     }
@@ -233,21 +247,29 @@ class SetupDatabase {
                 });
 
                 // Shutdown down this express and start the main server
-                log.info("setup-database", "Database is configured, close the setup-database server and start the main server now.");
+                log.info(
+                    "setup-database",
+                    "Database is configured, close the setup-database server and start the main server now.",
+                );
                 if (tempServer) {
                     tempServer.close(() => {
-                        log.info("setup-database", "The setup-database server is closed");
+                        log.info(
+                            "setup-database",
+                            "The setup-database server is closed",
+                        );
                         resolve();
                     });
                 } else {
                     resolve();
                 }
-
             });
 
-            app.use("/", expressStaticGzip("dist", {
-                enableBrotli: true,
-            }));
+            app.use(
+                "/",
+                expressStaticGzip("dist", {
+                    enableBrotli: true,
+                }),
+            );
 
             app.get("*", async (_request, response) => {
                 response.send(this.server.indexHTML);
@@ -259,9 +281,15 @@ class SetupDatabase {
             });
 
             tempServer = app.listen(port, hostname, () => {
-                log.info("setup-database", `Starting Setup Database on ${port}`);
-                let domain = (hostname) ? hostname : "localhost";
-                log.info("setup-database", `Open http://${domain}:${port} in your browser`);
+                log.info(
+                    "setup-database",
+                    `Starting Setup Database on ${port}`,
+                );
+                let domain = hostname ? hostname : "localhost";
+                log.info(
+                    "setup-database",
+                    `Open http://${domain}:${port} in your browser`,
+                );
                 log.info("setup-database", "Waiting for user action...");
             });
         });

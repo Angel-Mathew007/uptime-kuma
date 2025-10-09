@@ -8,7 +8,11 @@
         </div>
         <div v-else>
             <div class="add-btn">
-                <button class="btn btn-primary me-2" type="button" @click="$refs.apiKeyDialog.show()">
+                <button
+                    class="btn btn-primary me-2"
+                    type="button"
+                    @click="$refs.apiKeyDialog.show()"
+                >
                     <font-awesome-icon icon="plus" /> {{ $t("Add API Key") }}
                 </button>
             </div>
@@ -46,16 +50,30 @@
 
                     <div class="buttons">
                         <div class="btn-group" role="group">
-                            <button v-if="item.active" class="btn btn-normal" @click="disableDialog(item.id)">
-                                <font-awesome-icon icon="pause" /> {{ $t("Disable") }}
+                            <button
+                                v-if="item.active"
+                                class="btn btn-normal"
+                                @click="disableDialog(item.id)"
+                            >
+                                <font-awesome-icon icon="pause" />
+                                {{ $t("Disable") }}
                             </button>
 
-                            <button v-if="!item.active" class="btn btn-primary" @click="enableKey(item.id)">
-                                <font-awesome-icon icon="play" /> {{ $t("Enable") }}
+                            <button
+                                v-if="!item.active"
+                                class="btn btn-primary"
+                                @click="enableKey(item.id)"
+                            >
+                                <font-awesome-icon icon="play" />
+                                {{ $t("Enable") }}
                             </button>
 
-                            <button class="btn btn-danger" @click="deleteDialog(item.id)">
-                                <font-awesome-icon icon="trash" /> {{ $t("Delete") }}
+                            <button
+                                class="btn btn-danger"
+                                @click="deleteDialog(item.id)"
+                            >
+                                <font-awesome-icon icon="trash" />
+                                {{ $t("Delete") }}
                             </button>
                         </div>
                     </div>
@@ -63,15 +81,30 @@
             </div>
         </div>
 
-        <div class="text-center mt-3" style="font-size: 13px;">
-            <a href="https://github.com/louislam/uptime-kuma/wiki/API-Keys" target="_blank">{{ $t("Learn More") }}</a>
+        <div class="text-center mt-3" style="font-size: 13px">
+            <a
+                href="https://github.com/louislam/uptime-kuma/wiki/API-Keys"
+                target="_blank"
+                >{{ $t("Learn More") }}</a
+            >
         </div>
 
-        <Confirm ref="confirmPause" :yes-text="$t('Yes')" :no-text="$t('No')" @yes="disableKey">
+        <Confirm
+            ref="confirmPause"
+            :yes-text="$t('Yes')"
+            :no-text="$t('No')"
+            @yes="disableKey"
+        >
             {{ $t("disableAPIKeyMsg") }}
         </Confirm>
 
-        <Confirm ref="confirmDelete" btn-style="btn-danger" :yes-text="$t('Yes')" :no-text="$t('No')" @yes="deleteKey">
+        <Confirm
+            ref="confirmDelete"
+            btn-style="btn-danger"
+            :yes-text="$t('Yes')"
+            :no-text="$t('No')"
+            @yes="deleteKey"
+        >
             {{ $t("deleteAPIKeyMsg") }}
         </Confirm>
 

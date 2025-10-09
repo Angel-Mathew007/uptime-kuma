@@ -118,10 +118,11 @@ class UptimeCalculator {
         let now = this.getCurrentDate();
 
         // Load minutely data from database (recent 24 hours only)
-        let minutelyStatBeans = await R.find("stat_minutely", " monitor_id = ? AND timestamp > ? ORDER BY timestamp", [
-            monitorID,
-            this.getMinutelyKey(now.subtract(24, "hour")),
-        ]);
+        let minutelyStatBeans = await R.find(
+            "stat_minutely",
+            " monitor_id = ? AND timestamp > ? ORDER BY timestamp",
+            [monitorID, this.getMinutelyKey(now.subtract(24, "hour"))],
+        );
 
         for (let bean of minutelyStatBeans) {
             let data = {
@@ -144,10 +145,11 @@ class UptimeCalculator {
         }
 
         // Load hourly data from database (recent 30 days only)
-        let hourlyStatBeans = await R.find("stat_hourly", " monitor_id = ? AND timestamp > ? ORDER BY timestamp", [
-            monitorID,
-            this.getHourlyKey(now.subtract(30, "day")),
-        ]);
+        let hourlyStatBeans = await R.find(
+            "stat_hourly",
+            " monitor_id = ? AND timestamp > ? ORDER BY timestamp",
+            [monitorID, this.getHourlyKey(now.subtract(30, "day"))],
+        );
 
         for (let bean of hourlyStatBeans) {
             let data = {
@@ -169,10 +171,11 @@ class UptimeCalculator {
         }
 
         // Load daily data from database (recent 365 days only)
-        let dailyStatBeans = await R.find("stat_daily", " monitor_id = ? AND timestamp > ? ORDER BY timestamp", [
-            monitorID,
-            this.getDailyKey(now.subtract(365, "day")),
-        ]);
+        let dailyStatBeans = await R.find(
+            "stat_daily",
+            " monitor_id = ? AND timestamp > ? ORDER BY timestamp",
+            [monitorID, this.getDailyKey(now.subtract(365, "day"))],
+        );
 
         for (let bean of dailyStatBeans) {
             let data = {
@@ -209,7 +212,10 @@ class UptimeCalculator {
         let flatStatus = this.flatStatus(status);
 
         if (flatStatus === DOWN && ping > 0) {
-            log.debug("uptime-calc", "The ping is not effective when the status is DOWN");
+            log.debug(
+                "uptime-calc",
+                "The ping is not effective when the status is DOWN",
+            );
         }
 
         let divisionKey = this.getMinutelyKey(date);
@@ -221,10 +227,15 @@ class UptimeCalculator {
         let dailyData = this.dailyUptimeDataList[dailyKey];
 
         if (status === MAINTENANCE) {
-            minutelyData.maintenance = minutelyData.maintenance ? minutelyData.maintenance + 1 : 1;
-            hourlyData.maintenance = hourlyData.maintenance ? hourlyData.maintenance + 1 : 1;
-            dailyData.maintenance = dailyData.maintenance ? dailyData.maintenance + 1 : 1;
-
+            minutelyData.maintenance = minutelyData.maintenance
+                ? minutelyData.maintenance + 1
+                : 1;
+            hourlyData.maintenance = hourlyData.maintenance
+                ? hourlyData.maintenance + 1
+                : 1;
+            dailyData.maintenance = dailyData.maintenance
+                ? dailyData.maintenance + 1
+                : 1;
         } else if (flatStatus === UP) {
             minutelyData.up += 1;
             hourlyData.up += 1;
@@ -239,7 +250,9 @@ class UptimeCalculator {
                     minutelyData.minPing = ping;
                     minutelyData.maxPing = ping;
                 } else {
-                    minutelyData.avgPing = (minutelyData.avgPing * (minutelyData.up - 1) + ping) / minutelyData.up;
+                    minutelyData.avgPing =
+                        (minutelyData.avgPing * (minutelyData.up - 1) + ping) /
+                        minutelyData.up;
                     minutelyData.minPing = Math.min(minutelyData.minPing, ping);
                     minutelyData.maxPing = Math.max(minutelyData.maxPing, ping);
                 }
@@ -251,7 +264,9 @@ class UptimeCalculator {
                     hourlyData.minPing = ping;
                     hourlyData.maxPing = ping;
                 } else {
-                    hourlyData.avgPing = (hourlyData.avgPing * (hourlyData.up - 1) + ping) / hourlyData.up;
+                    hourlyData.avgPing =
+                        (hourlyData.avgPing * (hourlyData.up - 1) + ping) /
+                        hourlyData.up;
                     hourlyData.minPing = Math.min(hourlyData.minPing, ping);
                     hourlyData.maxPing = Math.max(hourlyData.maxPing, ping);
                 }
@@ -263,12 +278,13 @@ class UptimeCalculator {
                     dailyData.minPing = ping;
                     dailyData.maxPing = ping;
                 } else {
-                    dailyData.avgPing = (dailyData.avgPing * (dailyData.up - 1) + ping) / dailyData.up;
+                    dailyData.avgPing =
+                        (dailyData.avgPing * (dailyData.up - 1) + ping) /
+                        dailyData.up;
                     dailyData.minPing = Math.min(dailyData.minPing, ping);
                     dailyData.maxPing = Math.max(dailyData.maxPing, ping);
                 }
             }
-
         } else if (flatStatus === DOWN) {
             minutelyData.down += 1;
             hourlyData.down += 1;
@@ -301,7 +317,15 @@ class UptimeCalculator {
         dailyStatBean.pingMax = dailyData.maxPing;
         {
             // eslint-disable-next-line no-unused-vars
-            const { up, down, avgPing, minPing, maxPing, timestamp, ...extras } = dailyData;
+            const {
+                up,
+                down,
+                avgPing,
+                minPing,
+                maxPing,
+                timestamp,
+                ...extras
+            } = dailyData;
             if (Object.keys(extras).length > 0) {
                 dailyStatBean.extras = JSON.stringify(extras);
             }
@@ -312,7 +336,10 @@ class UptimeCalculator {
 
         // For migration mode, we don't need to store old hourly and minutely data, but we need 30-day's hourly data
         // Run anyway for non-migration mode
-        if (!this.migrationMode || date.isAfter(currentDate.subtract(this.statHourlyKeepDay, "day"))) {
+        if (
+            !this.migrationMode ||
+            date.isAfter(currentDate.subtract(this.statHourlyKeepDay, "day"))
+        ) {
             let hourlyStatBean = await this.getHourlyStatBean(hourlyKey);
             hourlyStatBean.up = hourlyData.up;
             hourlyStatBean.down = hourlyData.down;
@@ -321,7 +348,15 @@ class UptimeCalculator {
             hourlyStatBean.pingMax = hourlyData.maxPing;
             {
                 // eslint-disable-next-line no-unused-vars
-                const { up, down, avgPing, minPing, maxPing, timestamp, ...extras } = hourlyData;
+                const {
+                    up,
+                    down,
+                    avgPing,
+                    minPing,
+                    maxPing,
+                    timestamp,
+                    ...extras
+                } = hourlyData;
                 if (Object.keys(extras).length > 0) {
                     hourlyStatBean.extras = JSON.stringify(extras);
                 }
@@ -331,7 +366,12 @@ class UptimeCalculator {
 
         // For migration mode, we don't need to store old hourly and minutely data, but we need 24-hour's minutely data
         // Run anyway for non-migration mode
-        if (!this.migrationMode || date.isAfter(currentDate.subtract(this.statMinutelyKeepHour, "hour"))) {
+        if (
+            !this.migrationMode ||
+            date.isAfter(
+                currentDate.subtract(this.statMinutelyKeepHour, "hour"),
+            )
+        ) {
             let minutelyStatBean = await this.getMinutelyStatBean(divisionKey);
             minutelyStatBean.up = minutelyData.up;
             minutelyStatBean.down = minutelyData.down;
@@ -340,7 +380,15 @@ class UptimeCalculator {
             minutelyStatBean.pingMax = minutelyData.maxPing;
             {
                 // eslint-disable-next-line no-unused-vars
-                const { up, down, avgPing, minPing, maxPing, timestamp, ...extras } = minutelyData;
+                const {
+                    up,
+                    down,
+                    avgPing,
+                    minPing,
+                    maxPing,
+                    timestamp,
+                    ...extras
+                } = minutelyData;
                 if (Object.keys(extras).length > 0) {
                     minutelyStatBean.extras = JSON.stringify(extras);
                 }
@@ -353,15 +401,25 @@ class UptimeCalculator {
             // Remove the old data
             // TODO: Improvement: Convert it to a job?
             log.debug("uptime-calc", "Remove old data");
-            await R.exec("DELETE FROM stat_minutely WHERE monitor_id = ? AND timestamp < ?", [
-                this.monitorID,
-                this.getMinutelyKey(currentDate.subtract(this.statMinutelyKeepHour, "hour")),
-            ]);
+            await R.exec(
+                "DELETE FROM stat_minutely WHERE monitor_id = ? AND timestamp < ?",
+                [
+                    this.monitorID,
+                    this.getMinutelyKey(
+                        currentDate.subtract(this.statMinutelyKeepHour, "hour"),
+                    ),
+                ],
+            );
 
-            await R.exec("DELETE FROM stat_hourly WHERE monitor_id = ? AND timestamp < ?", [
-                this.monitorID,
-                this.getHourlyKey(currentDate.subtract(this.statHourlyKeepDay, "day")),
-            ]);
+            await R.exec(
+                "DELETE FROM stat_hourly WHERE monitor_id = ? AND timestamp < ?",
+                [
+                    this.monitorID,
+                    this.getHourlyKey(
+                        currentDate.subtract(this.statHourlyKeepDay, "day"),
+                    ),
+                ],
+            );
         }
 
         return date;
@@ -373,14 +431,18 @@ class UptimeCalculator {
      * @returns {Promise<import("redbean-node").Bean>} stat_daily bean
      */
     async getDailyStatBean(timestamp) {
-        if (this.lastDailyStatBean && this.lastDailyStatBean.timestamp === timestamp) {
+        if (
+            this.lastDailyStatBean &&
+            this.lastDailyStatBean.timestamp === timestamp
+        ) {
             return this.lastDailyStatBean;
         }
 
-        let bean = await R.findOne("stat_daily", " monitor_id = ? AND timestamp = ?", [
-            this.monitorID,
-            timestamp,
-        ]);
+        let bean = await R.findOne(
+            "stat_daily",
+            " monitor_id = ? AND timestamp = ?",
+            [this.monitorID, timestamp],
+        );
 
         if (!bean) {
             bean = R.dispense("stat_daily");
@@ -398,14 +460,18 @@ class UptimeCalculator {
      * @returns {Promise<import("redbean-node").Bean>} stat_hourly bean
      */
     async getHourlyStatBean(timestamp) {
-        if (this.lastHourlyStatBean && this.lastHourlyStatBean.timestamp === timestamp) {
+        if (
+            this.lastHourlyStatBean &&
+            this.lastHourlyStatBean.timestamp === timestamp
+        ) {
             return this.lastHourlyStatBean;
         }
 
-        let bean = await R.findOne("stat_hourly", " monitor_id = ? AND timestamp = ?", [
-            this.monitorID,
-            timestamp,
-        ]);
+        let bean = await R.findOne(
+            "stat_hourly",
+            " monitor_id = ? AND timestamp = ?",
+            [this.monitorID, timestamp],
+        );
 
         if (!bean) {
             bean = R.dispense("stat_hourly");
@@ -423,14 +489,18 @@ class UptimeCalculator {
      * @returns {Promise<import("redbean-node").Bean>} stat_minutely bean
      */
     async getMinutelyStatBean(timestamp) {
-        if (this.lastMinutelyStatBean && this.lastMinutelyStatBean.timestamp === timestamp) {
+        if (
+            this.lastMinutelyStatBean &&
+            this.lastMinutelyStatBean.timestamp === timestamp
+        ) {
             return this.lastMinutelyStatBean;
         }
 
-        let bean = await R.findOne("stat_minutely", " monitor_id = ? AND timestamp = ?", [
-            this.monitorID,
-            timestamp,
-        ]);
+        let bean = await R.findOne(
+            "stat_minutely",
+            " monitor_id = ? AND timestamp = ?",
+            [this.monitorID, timestamp],
+        );
 
         if (!bean) {
             bean = R.dispense("stat_minutely");
@@ -454,7 +524,7 @@ class UptimeCalculator {
         // Convert to timestamp in second
         let divisionKey = date.unix();
 
-        if (! (divisionKey in this.minutelyUptimeDataList)) {
+        if (!(divisionKey in this.minutelyUptimeDataList)) {
             this.minutelyUptimeDataList.push(divisionKey, {
                 up: 0,
                 down: 0,
@@ -479,7 +549,7 @@ class UptimeCalculator {
         // Convert to timestamp in second
         let divisionKey = date.unix();
 
-        if (! (divisionKey in this.hourlyUptimeDataList)) {
+        if (!(divisionKey in this.hourlyUptimeDataList)) {
             this.hourlyUptimeDataList.push(divisionKey, {
                 up: 0,
                 down: 0,
@@ -561,7 +631,6 @@ class UptimeCalculator {
      * @throws {Error} The maximum number of minutes greater than 1440
      */
     getData(num, type = "day") {
-
         if (type === "hour" && num > 24 * 30) {
             throw new Error("The maximum number of hours is 720");
         }
@@ -796,7 +865,8 @@ class UptimeCalculator {
             case "y":
                 return this.getData(365 * num, "day");
             default:
-                throw new Error(`Unsupported unit (${unit}) for badge duration ${duration}`
+                throw new Error(
+                    `Unsupported unit (${unit}) for badge duration ${duration}`,
                 );
         }
     }

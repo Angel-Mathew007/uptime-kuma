@@ -65,7 +65,7 @@ class ZohoCliq extends NotificationProvider {
      */
     _handleGeneralNotification = (webhookUrl, msg) => {
         const payload = this._notificationPayloadFactory({
-            monitorMessage: msg
+            monitorMessage: msg,
         });
 
         return this._sendNotification(webhookUrl, payload);
@@ -79,7 +79,10 @@ class ZohoCliq extends NotificationProvider {
 
         try {
             if (heartbeatJSON == null) {
-                await this._handleGeneralNotification(notification.webhookUrl, msg);
+                await this._handleGeneralNotification(
+                    notification.webhookUrl,
+                    msg,
+                );
                 return okMsg;
             }
 
@@ -87,12 +90,11 @@ class ZohoCliq extends NotificationProvider {
                 monitorMessage: heartbeatJSON.msg,
                 monitorName: monitorJSON.name,
                 monitorUrl: this.extractAddress(monitorJSON),
-                status: heartbeatJSON.status
+                status: heartbeatJSON.status,
             });
 
             await this._sendNotification(notification.webhookUrl, payload);
             return okMsg;
-
         } catch (error) {
             this.throwGeneralAxiosError(error);
         }

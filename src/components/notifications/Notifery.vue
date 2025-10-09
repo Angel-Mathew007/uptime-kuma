@@ -33,8 +33,10 @@
         />
     </div>
 
-    <i18n-t tag="p" keypath="More info on:" style="margin-top: 8px;">
-        <a href="https://docs.notifery.com/api/event/" target="_blank">https://docs.notifery.com/api/event/</a>
+    <i18n-t tag="p" keypath="More info on:" style="margin-top: 8px">
+        <a href="https://docs.notifery.com/api/event/" target="_blank"
+            >https://docs.notifery.com/api/event/</a
+        >
     </i18n-t>
 </template>
 

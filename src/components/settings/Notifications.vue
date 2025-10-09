@@ -8,20 +8,34 @@
                 {{ $t("notificationDescription") }}
             </p>
 
-            <ul class="list-group mb-3" style="border-radius: 1rem;">
-                <li v-for="(notification, index) in $root.notificationList" :key="index" class="list-group-item">
-                    {{ notification.name }}<br>
-                    <a href="#" @click="$refs.notificationDialog.show(notification.id)">{{ $t("Edit") }}</a>
+            <ul class="list-group mb-3" style="border-radius: 1rem">
+                <li
+                    v-for="(notification, index) in $root.notificationList"
+                    :key="index"
+                    class="list-group-item"
+                >
+                    {{ notification.name }}<br />
+                    <a
+                        href="#"
+                        @click="$refs.notificationDialog.show(notification.id)"
+                        >{{ $t("Edit") }}</a
+                    >
                 </li>
             </ul>
 
-            <button class="btn btn-primary me-2" type="button" @click="$refs.notificationDialog.show()">
+            <button
+                class="btn btn-primary me-2"
+                type="button"
+                @click="$refs.notificationDialog.show()"
+            >
                 {{ $t("Setup Notification") }}
             </button>
         </div>
 
         <div class="my-4 pt-4">
-            <h5 class="my-4 settings-subheading">{{ $t("monitorToastMessagesLabel") }}</h5>
+            <h5 class="my-4 settings-subheading">
+                {{ $t("monitorToastMessagesLabel") }}
+            </h5>
             <p>{{ $t("monitorToastMessagesDescription") }}</p>
 
             <div class="my-4">
@@ -54,22 +68,44 @@
         </div>
 
         <div class="my-4 pt-4">
-            <h5 class="my-4 settings-subheading">{{ $t("settingsCertificateExpiry") }}</h5>
+            <h5 class="my-4 settings-subheading">
+                {{ $t("settingsCertificateExpiry") }}
+            </h5>
             <p>{{ $t("certificationExpiryDescription") }}</p>
             <p>{{ $t("notificationDescription") }}</p>
             <div class="mt-1 mb-3 ps-2 cert-exp-days col-12 col-xl-6">
-                <div v-for="day in settings.tlsExpiryNotifyDays" :key="day" class="d-flex align-items-center justify-content-between cert-exp-day-row py-2">
+                <div
+                    v-for="day in settings.tlsExpiryNotifyDays"
+                    :key="day"
+                    class="d-flex align-items-center justify-content-between cert-exp-day-row py-2"
+                >
                     <span>{{ day }} {{ $tc("day", day) }}</span>
-                    <button type="button" class="btn-rm-expiry btn btn-outline-danger ms-2 py-1" :aria-label="$t('Remove the expiry notification')" @click="removeExpiryNotifDay(day)">
+                    <button
+                        type="button"
+                        class="btn-rm-expiry btn btn-outline-danger ms-2 py-1"
+                        :aria-label="$t('Remove the expiry notification')"
+                        @click="removeExpiryNotifDay(day)"
+                    >
                         <font-awesome-icon icon="times" />
                     </button>
                 </div>
             </div>
             <div class="col-12 col-xl-6">
-                <ActionInput v-model="expiryNotifInput" :type="'number'" :placeholder="$t('day')" :icon="'plus'" :action="() => addExpiryNotifDay(expiryNotifInput)" :action-aria-label="$t('Add a new expiry notification day')" />
+                <ActionInput
+                    v-model="expiryNotifInput"
+                    :type="'number'"
+                    :placeholder="$t('day')"
+                    :icon="'plus'"
+                    :action="() => addExpiryNotifDay(expiryNotifInput)"
+                    :action-aria-label="$t('Add a new expiry notification day')"
+                />
             </div>
             <div>
-                <button class="btn btn-primary" type="button" @click="saveSettings()">
+                <button
+                    class="btn btn-primary"
+                    type="button"
+                    @click="saveSettings()"
+                >
                     {{ $t("Save") }}
                 </button>
             </div>
@@ -117,15 +153,17 @@ export default {
         toastSuccessTimeoutSecs(newTimeout) {
             const parsedTimeout = parseInt(newTimeout);
             if (parsedTimeout != null && !Number.isNaN(parsedTimeout)) {
-                localStorage.toastSuccessTimeout = newTimeout > 0 ? newTimeout * 1000 : newTimeout;
+                localStorage.toastSuccessTimeout =
+                    newTimeout > 0 ? newTimeout * 1000 : newTimeout;
             }
         },
         toastErrorTimeoutSecs(newTimeout) {
             const parsedTimeout = parseInt(newTimeout);
             if (parsedTimeout != null && !Number.isNaN(parsedTimeout)) {
-                localStorage.toastErrorTimeout = newTimeout > 0 ? newTimeout * 1000 : newTimeout;
+                localStorage.toastErrorTimeout =
+                    newTimeout > 0 ? newTimeout * 1000 : newTimeout;
             }
-        }
+        },
     },
 
     mounted() {
@@ -139,7 +177,8 @@ export default {
          * @returns {void}
          */
         removeExpiryNotifDay(day) {
-            this.settings.tlsExpiryNotifyDays = this.settings.tlsExpiryNotifyDays.filter(d => d !== day);
+            this.settings.tlsExpiryNotifyDays =
+                this.settings.tlsExpiryNotifyDays.filter((d) => d !== day);
         },
         /**
          * Add a new expiry notification day.
@@ -155,7 +194,9 @@ export default {
             if (day != null && day !== "") {
                 const parsedDay = parseInt(day);
                 if (parsedDay != null && !isNaN(parsedDay) && parsedDay > 0) {
-                    if (!this.settings.tlsExpiryNotifyDays.includes(parsedDay)) {
+                    if (
+                        !this.settings.tlsExpiryNotifyDays.includes(parsedDay)
+                    ) {
                         this.settings.tlsExpiryNotifyDays.push(parseInt(day));
                         this.settings.tlsExpiryNotifyDays.sort((a, b) => a - b);
                         this.expiryNotifInput = null;
@@ -173,7 +214,10 @@ export default {
             if (successTimeout !== undefined) {
                 const parsedTimeout = parseInt(successTimeout);
                 if (parsedTimeout != null && !Number.isNaN(parsedTimeout)) {
-                    this.toastSuccessTimeoutSecs = parsedTimeout > 0 ? parsedTimeout / 1000 : parsedTimeout;
+                    this.toastSuccessTimeoutSecs =
+                        parsedTimeout > 0
+                            ? parsedTimeout / 1000
+                            : parsedTimeout;
                 }
             }
 
@@ -181,7 +225,10 @@ export default {
             if (errorTimeout !== undefined) {
                 const parsedTimeout = parseInt(errorTimeout);
                 if (parsedTimeout != null && !Number.isNaN(parsedTimeout)) {
-                    this.toastErrorTimeoutSecs = parsedTimeout > 0 ? parsedTimeout / 1000 : parsedTimeout;
+                    this.toastErrorTimeoutSecs =
+                        parsedTimeout > 0
+                            ? parsedTimeout / 1000
+                            : parsedTimeout;
                 }
             }
         },

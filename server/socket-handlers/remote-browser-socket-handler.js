@@ -3,7 +3,9 @@ const { checkLogin } = require("../util-server");
 const { RemoteBrowser } = require("../remote-browser");
 
 const { log } = require("../../src/util");
-const { testRemoteBrowser } = require("../monitor-types/real-browser-monitor-type");
+const {
+    testRemoteBrowser,
+} = require("../monitor-types/real-browser-monitor-type");
 
 /**
  * Handlers for docker hosts
@@ -11,27 +13,33 @@ const { testRemoteBrowser } = require("../monitor-types/real-browser-monitor-typ
  * @returns {void}
  */
 module.exports.remoteBrowserSocketHandler = (socket) => {
-    socket.on("addRemoteBrowser", async (remoteBrowser, remoteBrowserID, callback) => {
-        try {
-            checkLogin(socket);
+    socket.on(
+        "addRemoteBrowser",
+        async (remoteBrowser, remoteBrowserID, callback) => {
+            try {
+                checkLogin(socket);
 
-            let remoteBrowserBean = await RemoteBrowser.save(remoteBrowser, remoteBrowserID, socket.userID);
-            await sendRemoteBrowserList(socket);
+                let remoteBrowserBean = await RemoteBrowser.save(
+                    remoteBrowser,
+                    remoteBrowserID,
+                    socket.userID,
+                );
+                await sendRemoteBrowserList(socket);
 
-            callback({
-                ok: true,
-                msg: "Saved.",
-                msgi18n: true,
-                id: remoteBrowserBean.id,
-            });
-
-        } catch (e) {
-            callback({
-                ok: false,
-                msg: e.message,
-            });
-        }
-    });
+                callback({
+                    ok: true,
+                    msg: "Saved.",
+                    msgi18n: true,
+                    id: remoteBrowserBean.id,
+                });
+            } catch (e) {
+                callback({
+                    ok: false,
+                    msg: e.message,
+                });
+            }
+        },
+    );
 
     socket.on("deleteRemoteBrowser", async (dockerHostID, callback) => {
         try {
@@ -45,7 +53,6 @@ module.exports.remoteBrowserSocketHandler = (socket) => {
                 msg: "successDeleted",
                 msgi18n: true,
             });
-
         } catch (e) {
             callback({
                 ok: false,
@@ -69,7 +76,6 @@ module.exports.remoteBrowserSocketHandler = (socket) => {
                 ok: true,
                 msg,
             });
-
         } catch (e) {
             log.error("remoteBrowser", e);
 

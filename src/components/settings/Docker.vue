@@ -5,14 +5,26 @@
                 {{ $t("Not available, please setup.") }}
             </p>
 
-            <ul class="list-group mb-3" style="border-radius: 1rem;">
-                <li v-for="(dockerHost, index) in $root.dockerHostList" :key="index" class="list-group-item">
-                    {{ dockerHost.name }}<br>
-                    <a href="#" @click="$refs.dockerHostDialog.show(dockerHost.id)">{{ $t("Edit") }}</a>
+            <ul class="list-group mb-3" style="border-radius: 1rem">
+                <li
+                    v-for="(dockerHost, index) in $root.dockerHostList"
+                    :key="index"
+                    class="list-group-item"
+                >
+                    {{ dockerHost.name }}<br />
+                    <a
+                        href="#"
+                        @click="$refs.dockerHostDialog.show(dockerHost.id)"
+                        >{{ $t("Edit") }}</a
+                    >
                 </li>
             </ul>
 
-            <button class="btn btn-primary me-2" type="button" @click="$refs.dockerHostDialog.show()">
+            <button
+                class="btn btn-primary me-2"
+                type="button"
+                @click="$refs.dockerHostDialog.show()"
+            >
                 {{ $t("Setup Docker Host") }}
             </button>
         </div>
@@ -43,6 +55,6 @@ export default {
         settingsLoaded() {
             return this.$parent.$parent.$parent.settingsLoaded;
         },
-    }
+    },
 };
 </script>

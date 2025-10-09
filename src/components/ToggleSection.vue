@@ -2,13 +2,7 @@
     <div class="my-3 py-3">
         <h5 @click="isOpen = !isOpen">
             <div
-                class="
-                    w-50
-                    d-flex
-                    justify-content-between
-                    align-items-center
-                    pe-2
-                "
+                class="w-50 d-flex justify-content-between align-items-center pe-2"
             >
                 <span class="pb-2">{{ heading }}</span>
                 <font-awesome-icon

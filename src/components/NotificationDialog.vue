@@ -1,62 +1,132 @@
 <template>
     <form @submit.prevent="submit">
-        <div ref="modal" class="modal fade" tabindex="-1" data-bs-backdrop="static">
+        <div
+            ref="modal"
+            class="modal fade"
+            tabindex="-1"
+            data-bs-backdrop="static"
+        >
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 id="exampleModalLabel" class="modal-title">
                             {{ $t("Setup Notification") }}
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        />
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="notification-type" class="form-label">{{ $t("Notification Type") }}</label>
-                            <select id="notification-type" v-model="notification.type" class="form-select">
-                                <option v-for="(name, type) in notificationNameList.regularList" :key="type" :value="type">{{ name }}</option>
+                            <label for="notification-type" class="form-label">{{
+                                $t("Notification Type")
+                            }}</label>
+                            <select
+                                id="notification-type"
+                                v-model="notification.type"
+                                class="form-select"
+                            >
+                                <option
+                                    v-for="(
+                                        name, type
+                                    ) in notificationNameList.regularList"
+                                    :key="type"
+                                    :value="type"
+                                >
+                                    {{ name }}
+                                </option>
                                 <optgroup :label="$t('notificationRegional')">
-                                    <option v-for="(name, type) in notificationNameList.regionalList" :key="type" :value="type">{{ name }}</option>
+                                    <option
+                                        v-for="(
+                                            name, type
+                                        ) in notificationNameList.regionalList"
+                                        :key="type"
+                                        :value="type"
+                                    >
+                                        {{ name }}
+                                    </option>
                                 </optgroup>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label for="notification-name" class="form-label">{{ $t("Friendly Name") }}</label>
-                            <input id="notification-name" v-model="notification.name" type="text" class="form-control" required>
+                            <label for="notification-name" class="form-label">{{
+                                $t("Friendly Name")
+                            }}</label>
+                            <input
+                                id="notification-name"
+                                v-model="notification.name"
+                                type="text"
+                                class="form-control"
+                                required
+                            />
                         </div>
 
                         <!-- form body -->
                         <component :is="currentForm" />
 
                         <div class="mb-3 mt-4">
-                            <hr class="dropdown-divider mb-4">
+                            <hr class="dropdown-divider mb-4" />
 
                             <div class="form-check form-switch">
-                                <input v-model="notification.isDefault" class="form-check-input" type="checkbox">
-                                <label class="form-check-label">{{ $t("Default enabled") }}</label>
+                                <input
+                                    v-model="notification.isDefault"
+                                    class="form-check-input"
+                                    type="checkbox"
+                                />
+                                <label class="form-check-label">{{
+                                    $t("Default enabled")
+                                }}</label>
                             </div>
                             <div class="form-text">
                                 {{ $t("enableDefaultNotificationDescription") }}
                             </div>
 
-                            <br>
+                            <br />
 
                             <div class="form-check form-switch">
-                                <input v-model="notification.applyExisting" class="form-check-input" type="checkbox">
-                                <label class="form-check-label">{{ $t("Apply on all existing monitors") }}</label>
+                                <input
+                                    v-model="notification.applyExisting"
+                                    class="form-check-input"
+                                    type="checkbox"
+                                />
+                                <label class="form-check-label">{{
+                                    $t("Apply on all existing monitors")
+                                }}</label>
                             </div>
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button v-if="id" type="button" class="btn btn-danger" :disabled="processing" @click="deleteConfirm">
+                        <button
+                            v-if="id"
+                            type="button"
+                            class="btn btn-danger"
+                            :disabled="processing"
+                            @click="deleteConfirm"
+                        >
                             {{ $t("Delete") }}
                         </button>
-                        <button type="button" class="btn btn-warning" :disabled="processing" @click="test">
+                        <button
+                            type="button"
+                            class="btn btn-warning"
+                            :disabled="processing"
+                            @click="test"
+                        >
                             {{ $t("Test") }}
                         </button>
-                        <button type="submit" class="btn btn-primary" :disabled="processing">
-                            <div v-if="processing" class="spinner-border spinner-border-sm me-1"></div>
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            :disabled="processing"
+                        >
+                            <div
+                                v-if="processing"
+                                class="spinner-border spinner-border-sm me-1"
+                            ></div>
                             {{ $t("Save") }}
                         </button>
                     </div>
@@ -65,7 +135,13 @@
         </div>
     </form>
 
-    <Confirm ref="confirmDelete" btn-style="btn-danger" :yes-text="$t('Yes')" :no-text="$t('No')" @yes="deleteNotification">
+    <Confirm
+        ref="confirmDelete"
+        btn-style="btn-danger"
+        :yes-text="$t('Yes')"
+        :no-text="$t('No')"
+        @yes="deleteNotification"
+    >
         {{ $t("deleteNotificationMsg") }}
     </Confirm>
 </template>
@@ -81,22 +157,24 @@ export default {
         Confirm,
     },
     props: {},
-    emits: [ "added" ],
+    emits: ["added"],
     data() {
         return {
             model: null,
             processing: false,
             id: null,
-            notificationTypes: Object.keys(NotificationFormList).sort((a, b) => {
-                return a.toLowerCase().localeCompare(b.toLowerCase());
-            }),
+            notificationTypes: Object.keys(NotificationFormList).sort(
+                (a, b) => {
+                    return a.toLowerCase().localeCompare(b.toLowerCase());
+                },
+            ),
             notification: {
                 name: "",
                 /** @type { null | keyof NotificationFormList } */
                 type: null,
                 isDefault: false,
                 // Do not set default value here, please scroll to show()
-            }
+            },
         };
     },
 
@@ -110,90 +188,91 @@ export default {
 
         notificationNameList() {
             let regularList = {
-                "alerta": "Alerta",
-                "AlertNow": "AlertNow",
-                "apprise": this.$t("apprise"),
-                "Bark": "Bark",
-                "Bitrix24": "Bitrix24",
-                "clicksendsms": "ClickSend SMS",
-                "CallMeBot": "CallMeBot (WhatsApp, Telegram Call, Facebook Messanger)",
-                "discord": "Discord",
-                "Elks": "46elks",
-                "GoogleChat": "Google Chat (Google Workspace)",
-                "gorush": "Gorush",
-                "gotify": "Gotify",
-                "GrafanaOncall": "Grafana Oncall",
-                "HeiiOnCall": "Heii On-Call",
-                "HomeAssistant": "Home Assistant",
-                "Keep": "Keep",
-                "Kook": "Kook",
-                "line": "LINE Messenger",
-                "LineNotify": "LINE Notify",
-                "lunasea": "LunaSea",
-                "matrix": "Matrix",
-                "mattermost": "Mattermost",
-                "nextcloudtalk": "Nextcloud Talk",
-                "nostr": "Nostr",
-                "ntfy": "Ntfy",
-                "octopush": "Octopush",
-                "OneChat": "OneChat",
-                "OneBot": "OneBot",
-                "Onesender": "Onesender",
-                "Opsgenie": "Opsgenie",
-                "PagerDuty": "PagerDuty",
-                "PagerTree": "PagerTree",
-                "pumble": "Pumble",
-                "pushbullet": "Pushbullet",
-                "PushByTechulus": "Push by Techulus",
-                "pushover": "Pushover",
-                "pushy": "Pushy",
+                alerta: "Alerta",
+                AlertNow: "AlertNow",
+                apprise: this.$t("apprise"),
+                Bark: "Bark",
+                Bitrix24: "Bitrix24",
+                clicksendsms: "ClickSend SMS",
+                CallMeBot:
+                    "CallMeBot (WhatsApp, Telegram Call, Facebook Messanger)",
+                discord: "Discord",
+                Elks: "46elks",
+                GoogleChat: "Google Chat (Google Workspace)",
+                gorush: "Gorush",
+                gotify: "Gotify",
+                GrafanaOncall: "Grafana Oncall",
+                HeiiOnCall: "Heii On-Call",
+                HomeAssistant: "Home Assistant",
+                Keep: "Keep",
+                Kook: "Kook",
+                line: "LINE Messenger",
+                LineNotify: "LINE Notify",
+                lunasea: "LunaSea",
+                matrix: "Matrix",
+                mattermost: "Mattermost",
+                nextcloudtalk: "Nextcloud Talk",
+                nostr: "Nostr",
+                ntfy: "Ntfy",
+                octopush: "Octopush",
+                OneChat: "OneChat",
+                OneBot: "OneBot",
+                Onesender: "Onesender",
+                Opsgenie: "Opsgenie",
+                PagerDuty: "PagerDuty",
+                PagerTree: "PagerTree",
+                pumble: "Pumble",
+                pushbullet: "Pushbullet",
+                PushByTechulus: "Push by Techulus",
+                pushover: "Pushover",
+                pushy: "Pushy",
                 "rocket.chat": "Rocket.Chat",
-                "signal": "Signal",
-                "SIGNL4": "SIGNL4",
-                "slack": "Slack",
-                "squadcast": "SquadCast",
-                "SMSEagle": "SMSEagle",
-                "SMSPartner": "SMS Partner",
-                "smtp": this.$t("smtp"),
-                "stackfield": "Stackfield",
-                "teams": "Microsoft Teams",
-                "telegram": "Telegram",
-                "threema": "Threema",
-                "twilio": "Twilio",
-                "Splunk": "Splunk",
-                "webhook": "Webhook",
-                "GoAlert": "GoAlert",
-                "ZohoCliq": "ZohoCliq",
-                "SevenIO": "SevenIO",
-                "whapi": "WhatsApp (Whapi)",
-                "evolution": "WhatsApp (Evolution)",
-                "waha": "WhatsApp (WAHA)",
-                "gtxmessaging": "GtxMessaging",
-                "Cellsynt": "Cellsynt",
-                "SendGrid": "SendGrid",
-                "Brevo": "Brevo",
-                "notifery": "Notifery"
+                signal: "Signal",
+                SIGNL4: "SIGNL4",
+                slack: "Slack",
+                squadcast: "SquadCast",
+                SMSEagle: "SMSEagle",
+                SMSPartner: "SMS Partner",
+                smtp: this.$t("smtp"),
+                stackfield: "Stackfield",
+                teams: "Microsoft Teams",
+                telegram: "Telegram",
+                threema: "Threema",
+                twilio: "Twilio",
+                Splunk: "Splunk",
+                webhook: "Webhook",
+                GoAlert: "GoAlert",
+                ZohoCliq: "ZohoCliq",
+                SevenIO: "SevenIO",
+                whapi: "WhatsApp (Whapi)",
+                evolution: "WhatsApp (Evolution)",
+                waha: "WhatsApp (WAHA)",
+                gtxmessaging: "GtxMessaging",
+                Cellsynt: "Cellsynt",
+                SendGrid: "SendGrid",
+                Brevo: "Brevo",
+                notifery: "Notifery",
             };
 
             // Put notifications here if it's not supported in most regions or its documentation is not in English
             let regionalList = {
-                "AliyunSMS": "AliyunSMS (阿里云短信服务)",
-                "DingDing": "DingDing (钉钉自定义机器人)",
-                "Feishu": "Feishu (飞书)",
-                "FlashDuty": "FlashDuty (快猫星云)",
-                "FreeMobile": "FreeMobile (mobile.free.fr)",
-                "PushDeer": "PushDeer",
-                "promosms": "PromoSMS",
-                "serwersms": "SerwerSMS.pl",
-                "SMSManager": "SmsManager (smsmanager.cz)",
-                "WeCom": "WeCom (企业微信群机器人)",
-                "ServerChan": "ServerChan (Server酱)",
-                "PushPlus": "PushPlus (推送加)",
-                "SpugPush": "SpugPush（Spug推送助手）",
-                "smsc": "SMSC",
-                "WPush": "WPush(wpush.cn)",
-                "YZJ": "YZJ (云之家自定义机器人)",
-                "SMSPlanet": "SMSPlanet.pl"
+                AliyunSMS: "AliyunSMS (阿里云短信服务)",
+                DingDing: "DingDing (钉钉自定义机器人)",
+                Feishu: "Feishu (飞书)",
+                FlashDuty: "FlashDuty (快猫星云)",
+                FreeMobile: "FreeMobile (mobile.free.fr)",
+                PushDeer: "PushDeer",
+                promosms: "PromoSMS",
+                serwersms: "SerwerSMS.pl",
+                SMSManager: "SmsManager (smsmanager.cz)",
+                WeCom: "WeCom (企业微信群机器人)",
+                ServerChan: "ServerChan (Server酱)",
+                PushPlus: "PushPlus (推送加)",
+                SpugPush: "SpugPush（Spug推送助手）",
+                smsc: "SMSC",
+                WPush: "WPush(wpush.cn)",
+                YZJ: "YZJ (云之家自定义机器人)",
+                SMSPlanet: "SMSPlanet.pl",
             };
 
             // Sort by notification name
@@ -201,11 +280,14 @@ export default {
             // https://stackoverflow.com/questions/1069666/sorting-object-property-by-values
             let sort = (list2) => {
                 return Object.entries(list2)
-                    .sort(([ , a ], [ , b ]) => a.localeCompare(b))
-                    .reduce((r, [ k, v ]) => ({
-                        ...r,
-                        [k]: v
-                    }), {});
+                    .sort(([, a], [, b]) => a.localeCompare(b))
+                    .reduce(
+                        (r, [k, v]) => ({
+                            ...r,
+                            [k]: v,
+                        }),
+                        {},
+                    );
             };
 
             return {
@@ -216,10 +298,14 @@ export default {
 
         notificationFullNameList() {
             let list = {};
-            for (let [ key, value ] of Object.entries(this.notificationNameList.regularList)) {
+            for (let [key, value] of Object.entries(
+                this.notificationNameList.regularList,
+            )) {
                 list[key] = value;
             }
-            for (let [ key, value ] of Object.entries(this.notificationNameList.regionalList)) {
+            for (let [key, value] of Object.entries(
+                this.notificationNameList.regionalList,
+            )) {
                 list[key] = value;
             }
             return list;
@@ -235,7 +321,7 @@ export default {
                 oldName = "";
             }
 
-            if (! this.notification.name || this.notification.name === oldName) {
+            if (!this.notification.name || this.notification.name === oldName) {
                 this.notification.name = this.getUniqueDefaultName(to);
             }
         },
@@ -247,7 +333,6 @@ export default {
         this.cleanupModal();
     },
     methods: {
-
         /**
          * Show dialog to confirm deletion
          * @returns {void}
@@ -290,20 +375,21 @@ export default {
          */
         submit() {
             this.processing = true;
-            this.$root.getSocket().emit("addNotification", this.notification, this.id, (res) => {
-                this.$root.toastRes(res);
-                this.processing = false;
+            this.$root
+                .getSocket()
+                .emit("addNotification", this.notification, this.id, (res) => {
+                    this.$root.toastRes(res);
+                    this.processing = false;
 
-                if (res.ok) {
-                    this.modal.hide();
+                    if (res.ok) {
+                        this.modal.hide();
 
-                    // Emit added event, doesn't emit edit.
-                    if (! this.id) {
-                        this.$emit("added", res.id);
+                        // Emit added event, doesn't emit edit.
+                        if (!this.id) {
+                            this.$emit("added", res.id);
+                        }
                     }
-
-                }
-            });
+                });
         },
 
         /**
@@ -312,10 +398,12 @@ export default {
          */
         test() {
             this.processing = true;
-            this.$root.getSocket().emit("testNotification", this.notification, (res) => {
-                this.$root.toastRes(res);
-                this.processing = false;
-            });
+            this.$root
+                .getSocket()
+                .emit("testNotification", this.notification, (res) => {
+                    this.$root.toastRes(res);
+                    this.processing = false;
+                });
         },
 
         /**
@@ -324,14 +412,16 @@ export default {
          */
         deleteNotification() {
             this.processing = true;
-            this.$root.getSocket().emit("deleteNotification", this.id, (res) => {
-                this.$root.toastRes(res);
-                this.processing = false;
+            this.$root
+                .getSocket()
+                .emit("deleteNotification", this.id, (res) => {
+                    this.$root.toastRes(res);
+                    this.processing = false;
 
-                if (res.ok) {
-                    this.modal.hide();
-                }
-            });
+                    if (res.ok) {
+                        this.modal.hide();
+                    }
+                });
         },
         /**
          * Get a unique default name for the notification
@@ -340,15 +430,18 @@ export default {
          * @returns {string} Default name
          */
         getUniqueDefaultName(notificationKey) {
-
             let index = 1;
             let name = "";
             do {
                 name = this.$t("defaultNotificationName", {
-                    notification: this.notificationFullNameList[notificationKey].replace(/\(.+\)/, "").trim(),
-                    number: index++
+                    notification: this.notificationFullNameList[notificationKey]
+                        .replace(/\(.+\)/, "")
+                        .trim(),
+                    number: index++,
                 });
-            } while (this.$root.notificationList.find(it => it.name === name));
+            } while (
+                this.$root.notificationList.find((it) => it.name === name)
+            );
             return name;
         },
 
@@ -364,7 +457,7 @@ export default {
                     console.warn("Modal hide failed:", e);
                 }
             }
-        }
+        },
     },
 };
 </script>
@@ -373,7 +466,8 @@ export default {
 @import "../assets/vars.scss";
 
 .dark {
-    .modal-dialog .form-text, .modal-dialog p {
+    .modal-dialog .form-text,
+    .modal-dialog p {
         color: $dark-font-color;
     }
 }

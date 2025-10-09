@@ -12,17 +12,24 @@ class Gotify extends NotificationProvider {
 
         try {
             let config = this.getAxiosConfigWithProxy({});
-            if (notification.gotifyserverurl && notification.gotifyserverurl.endsWith("/")) {
-                notification.gotifyserverurl = notification.gotifyserverurl.slice(0, -1);
+            if (
+                notification.gotifyserverurl &&
+                notification.gotifyserverurl.endsWith("/")
+            ) {
+                notification.gotifyserverurl =
+                    notification.gotifyserverurl.slice(0, -1);
             }
-            await axios.post(`${notification.gotifyserverurl}/message?token=${notification.gotifyapplicationToken}`, {
-                "message": msg,
-                "priority": notification.gotifyPriority || 8,
-                "title": "Uptime-Kuma",
-            }, config);
+            await axios.post(
+                `${notification.gotifyserverurl}/message?token=${notification.gotifyapplicationToken}`,
+                {
+                    message: msg,
+                    priority: notification.gotifyPriority || 8,
+                    title: "Uptime-Kuma",
+                },
+                config,
+            );
 
             return okMsg;
-
         } catch (error) {
             this.throwGeneralAxiosError(error);
         }

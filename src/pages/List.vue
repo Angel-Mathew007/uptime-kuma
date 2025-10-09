@@ -20,5 +20,4 @@ export default {
 .shadow-box {
     padding: 20px;
 }
-
 </style>

@@ -18,17 +18,35 @@ class Splunk extends NotificationProvider {
                     type: "ping",
                     url: "Uptime Kuma Test Button",
                 };
-                return this.postNotification(notification, title, msg, monitor, "trigger");
+                return this.postNotification(
+                    notification,
+                    title,
+                    msg,
+                    monitor,
+                    "trigger",
+                );
             }
 
             if (heartbeatJSON.status === UP) {
                 const title = "Uptime Kuma Monitor ✅ Up";
-                return this.postNotification(notification, title, heartbeatJSON.msg, monitorJSON, "recovery");
+                return this.postNotification(
+                    notification,
+                    title,
+                    heartbeatJSON.msg,
+                    monitorJSON,
+                    "recovery",
+                );
             }
 
             if (heartbeatJSON.status === DOWN) {
                 const title = "Uptime Kuma Monitor 🔴 Down";
-                return this.postNotification(notification, title, heartbeatJSON.msg, monitorJSON, "trigger");
+                return this.postNotification(
+                    notification,
+                    title,
+                    heartbeatJSON.msg,
+                    monitorJSON,
+                    "trigger",
+                );
             }
         } catch (error) {
             this.throwGeneralAxiosError(error);
@@ -43,10 +61,14 @@ class Splunk extends NotificationProvider {
      */
     checkResult(result) {
         if (result.status == null) {
-            throw new Error("Splunk notification failed with invalid response!");
+            throw new Error(
+                "Splunk notification failed with invalid response!",
+            );
         }
         if (result.status < 200 || result.status >= 300) {
-            throw new Error("Splunk notification failed with status code " + result.status);
+            throw new Error(
+                "Splunk notification failed with status code " + result.status,
+            );
         }
     }
 
@@ -59,8 +81,13 @@ class Splunk extends NotificationProvider {
      * @param {?string} eventAction Action event for PagerDuty (trigger, acknowledge, resolve)
      * @returns {Promise<string>} Success state
      */
-    async postNotification(notification, title, body, monitorInfo, eventAction = "trigger") {
-
+    async postNotification(
+        notification,
+        title,
+        body,
+        monitorInfo,
+        eventAction = "trigger",
+    ) {
         let monitorUrl;
         if (monitorInfo.type === "port") {
             monitorUrl = monitorInfo.hostname;
@@ -92,13 +119,14 @@ class Splunk extends NotificationProvider {
                 entity_display_name: "Uptime Kuma Alert: " + monitorInfo.name,
                 routing_key: notification.pagerdutyIntegrationKey,
                 entity_id: "Uptime Kuma/" + monitorInfo.id,
-            }
+            },
         };
 
         const baseURL = await setting("primaryBaseURL");
         if (baseURL && monitorInfo) {
             options.client = "Uptime Kuma";
-            options.client_url = baseURL + getMonitorRelativeURL(monitorInfo.id);
+            options.client_url =
+                baseURL + getMonitorRelativeURL(monitorInfo.id);
         }
 
         let result = await axios.request(options);

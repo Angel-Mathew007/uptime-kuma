@@ -16,7 +16,7 @@ class SMTP extends NotificationProvider {
             secure: notification.smtpSecure,
             tls: {
                 rejectUnauthorized: !notification.smtpIgnoreTLSError || false,
-            }
+            },
         };
 
         // Fix #1129
@@ -52,11 +52,21 @@ class SMTP extends NotificationProvider {
             const customSubject = notification.customSubject?.trim() || "";
             const customBody = notification.customBody?.trim() || "";
             if (customSubject !== "") {
-                subject = await this.renderTemplate(customSubject, msg, monitorJSON, heartbeatJSON);
+                subject = await this.renderTemplate(
+                    customSubject,
+                    msg,
+                    monitorJSON,
+                    heartbeatJSON,
+                );
             }
             if (customBody !== "") {
                 useHTMLBody = notification.htmlBody || false;
-                body = await this.renderTemplate(customBody, msg, monitorJSON, heartbeatJSON);
+                body = await this.renderTemplate(
+                    customBody,
+                    msg,
+                    monitorJSON,
+                    heartbeatJSON,
+                );
             }
         }
 
@@ -69,7 +79,7 @@ class SMTP extends NotificationProvider {
             to: notification.smtpTo,
             subject: subject,
             // If the email body is custom, and the user wants it, set the email body as HTML
-            [useHTMLBody ? "html" : "text"]: body
+            [useHTMLBody ? "html" : "text"]: body,
         });
 
         return okMsg;

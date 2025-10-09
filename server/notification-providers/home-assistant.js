@@ -12,7 +12,8 @@ class HomeAssistant extends NotificationProvider {
     async send(notification, msg, monitorJSON = null, heartbeatJSON = null) {
         const okMsg = "Sent Successfully.";
 
-        const notificationService = notification?.notificationService || defaultNotificationService;
+        const notificationService =
+            notification?.notificationService || defaultNotificationService;
 
         try {
             let config = {
@@ -27,13 +28,18 @@ class HomeAssistant extends NotificationProvider {
                 {
                     title: "Uptime Kuma",
                     message: msg,
-                    ...(notificationService !== "persistent_notification" && { data: {
-                        name: monitorJSON?.name,
-                        status: heartbeatJSON?.status,
-                        channel: "Uptime Kuma",
-                        icon_url: "https://github.com/louislam/uptime-kuma/blob/master/public/icon.png?raw=true",
-                    } }),
-                }, config);
+                    ...(notificationService !== "persistent_notification" && {
+                        data: {
+                            name: monitorJSON?.name,
+                            status: heartbeatJSON?.status,
+                            channel: "Uptime Kuma",
+                            icon_url:
+                                "https://github.com/louislam/uptime-kuma/blob/master/public/icon.png?raw=true",
+                        },
+                    }),
+                },
+                config,
+            );
 
             return okMsg;
         } catch (error) {

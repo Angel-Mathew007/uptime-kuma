@@ -11,9 +11,11 @@ class TechulusPush extends NotificationProvider {
         const okMsg = "Sent Successfully.";
 
         let data = {
-            "title": notification?.pushTitle?.length ? notification.pushTitle : "Uptime-Kuma",
-            "body": msg,
-            "timeSensitive": notification.pushTimeSensitive ?? true,
+            title: notification?.pushTitle?.length
+                ? notification.pushTitle
+                : "Uptime-Kuma",
+            body: msg,
+            timeSensitive: notification.pushTimeSensitive ?? true,
         };
 
         if (notification.pushChannel) {
@@ -26,7 +28,11 @@ class TechulusPush extends NotificationProvider {
 
         try {
             let config = this.getAxiosConfigWithProxy({});
-            await axios.post(`https://push.techulus.com/api/v1/notify/${notification.pushAPIKey}`, data, config);
+            await axios.post(
+                `https://push.techulus.com/api/v1/notify/${notification.pushAPIKey}`,
+                data,
+                config,
+            );
             return okMsg;
         } catch (error) {
             this.throwGeneralAxiosError(error);

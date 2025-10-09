@@ -11,12 +11,21 @@
             <font-awesome-icon icon="trash" />
         </button>
 
-        <select v-if="!isFirst" v-model="model.andOr" class="form-select and-or-select" data-testid="condition-and-or">
+        <select
+            v-if="!isFirst"
+            v-model="model.andOr"
+            class="form-select and-or-select"
+            data-testid="condition-and-or"
+        >
             <option value="and">{{ $t("and") }}</option>
             <option value="or">{{ $t("or") }}</option>
         </select>
 
-        <select v-model="model.variable" class="form-select" data-testid="condition-variable">
+        <select
+            v-model="model.variable"
+            class="form-select"
+            data-testid="condition-variable"
+        >
             <option
                 v-for="variable in conditionVariables"
                 :key="variable.id"
@@ -26,7 +35,11 @@
             </option>
         </select>
 
-        <select v-model="model.operator" class="form-select" data-testid="condition-operator">
+        <select
+            v-model="model.operator"
+            class="form-select"
+            data-testid="condition-operator"
+        >
             <option
                 v-for="operator in getVariableOperators(model.variable)"
                 :key="operator.id"
@@ -94,7 +107,7 @@ export default {
         },
     },
 
-    emits: [ "update:modelValue", "remove" ],
+    emits: ["update:modelValue", "remove"],
 
     computed: {
         model: {
@@ -103,8 +116,8 @@ export default {
             },
             set(value) {
                 this.$emit("update:modelValue", value);
-            }
-        }
+            },
+        },
     },
 
     methods: {
@@ -113,7 +126,10 @@ export default {
         },
 
         getVariableOperators(variableId) {
-            return this.conditionVariables.find(v => v.id === variableId)?.operators ?? [];
+            return (
+                this.conditionVariables.find((v) => v.id === variableId)
+                    ?.operators ?? []
+            );
         },
     },
 };

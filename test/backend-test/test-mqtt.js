@@ -52,52 +52,87 @@ async function testMqtt(mqttSuccessMessage, mqttCheckType, receivedMessage) {
     return heartbeat;
 }
 
-describe("MqttMonitorType", {
-    concurrency: true,
-    skip: !!process.env.CI && (process.platform !== "linux" || process.arch !== "x64")
-}, () => {
-    test("valid keywords (type=default)", async () => {
-        const heartbeat = await testMqtt("KEYWORD", null, "-> KEYWORD <-");
-        assert.strictEqual(heartbeat.status, UP);
-        assert.strictEqual(heartbeat.msg, "Topic: test; Message: -> KEYWORD <-");
-    });
+describe(
+    "MqttMonitorType",
+    {
+        concurrency: true,
+        skip:
+            !!process.env.CI &&
+            (process.platform !== "linux" || process.arch !== "x64"),
+    },
+    () => {
+        test("valid keywords (type=default)", async () => {
+            const heartbeat = await testMqtt("KEYWORD", null, "-> KEYWORD <-");
+            assert.strictEqual(heartbeat.status, UP);
+            assert.strictEqual(
+                heartbeat.msg,
+                "Topic: test; Message: -> KEYWORD <-",
+            );
+        });
 
-    test("valid keywords (type=keyword)", async () => {
-        const heartbeat = await testMqtt("KEYWORD", "keyword", "-> KEYWORD <-");
-        assert.strictEqual(heartbeat.status, UP);
-        assert.strictEqual(heartbeat.msg, "Topic: test; Message: -> KEYWORD <-");
-    });
-    test("invalid keywords (type=default)", async () => {
-        await assert.rejects(
-            testMqtt("NOT_PRESENT", null, "-> KEYWORD <-"),
-            new Error("Message Mismatch - Topic: test; Message: -> KEYWORD <-"),
-        );
-    });
+        test("valid keywords (type=keyword)", async () => {
+            const heartbeat = await testMqtt(
+                "KEYWORD",
+                "keyword",
+                "-> KEYWORD <-",
+            );
+            assert.strictEqual(heartbeat.status, UP);
+            assert.strictEqual(
+                heartbeat.msg,
+                "Topic: test; Message: -> KEYWORD <-",
+            );
+        });
+        test("invalid keywords (type=default)", async () => {
+            await assert.rejects(
+                testMqtt("NOT_PRESENT", null, "-> KEYWORD <-"),
+                new Error(
+                    "Message Mismatch - Topic: test; Message: -> KEYWORD <-",
+                ),
+            );
+        });
 
-    test("invalid keyword (type=keyword)", async () => {
-        await assert.rejects(
-            testMqtt("NOT_PRESENT", "keyword", "-> KEYWORD <-"),
-            new Error("Message Mismatch - Topic: test; Message: -> KEYWORD <-"),
-        );
-    });
-    test("valid json-query", async () => {
-        // works because the monitors' jsonPath is hard-coded to "firstProp"
-        const heartbeat = await testMqtt("present", "json-query", "{\"firstProp\":\"present\"}");
-        assert.strictEqual(heartbeat.status, UP);
-        assert.strictEqual(heartbeat.msg, "Message received, expected value is found");
-    });
-    test("invalid (because query fails) json-query", async () => {
-        // works because the monitors' jsonPath is hard-coded to "firstProp"
-        await assert.rejects(
-            testMqtt("[not_relevant]", "json-query", "{}"),
-            new Error("Message received but value is not equal to expected value, value was: [undefined]"),
-        );
-    });
-    test("invalid (because successMessage fails) json-query", async () => {
-        // works because the monitors' jsonPath is hard-coded to "firstProp"
-        await assert.rejects(
-            testMqtt("[wrong_success_messsage]", "json-query", "{\"firstProp\":\"present\"}"),
-            new Error("Message received but value is not equal to expected value, value was: [present]")
-        );
-    });
-});
+        test("invalid keyword (type=keyword)", async () => {
+            await assert.rejects(
+                testMqtt("NOT_PRESENT", "keyword", "-> KEYWORD <-"),
+                new Error(
+                    "Message Mismatch - Topic: test; Message: -> KEYWORD <-",
+                ),
+            );
+        });
+        test("valid json-query", async () => {
+            // works because the monitors' jsonPath is hard-coded to "firstProp"
+            const heartbeat = await testMqtt(
+                "present",
+                "json-query",
+                '{"firstProp":"present"}',
+            );
+            assert.strictEqual(heartbeat.status, UP);
+            assert.strictEqual(
+                heartbeat.msg,
+                "Message received, expected value is found",
+            );
+        });
+        test("invalid (because query fails) json-query", async () => {
+            // works because the monitors' jsonPath is hard-coded to "firstProp"
+            await assert.rejects(
+                testMqtt("[not_relevant]", "json-query", "{}"),
+                new Error(
+                    "Message received but value is not equal to expected value, value was: [undefined]",
+                ),
+            );
+        });
+        test("invalid (because successMessage fails) json-query", async () => {
+            // works because the monitors' jsonPath is hard-coded to "firstProp"
+            await assert.rejects(
+                testMqtt(
+                    "[wrong_success_messsage]",
+                    "json-query",
+                    '{"firstProp":"present"}',
+                ),
+                new Error(
+                    "Message received but value is not equal to expected value, value was: [present]",
+                ),
+            );
+        });
+    },
+);

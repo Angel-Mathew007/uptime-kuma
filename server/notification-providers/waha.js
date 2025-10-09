@@ -13,20 +13,22 @@ class WAHA extends NotificationProvider {
         try {
             let config = {
                 headers: {
-                    "Accept": "application/json",
+                    Accept: "application/json",
                     "Content-Type": "application/json",
                     "X-Api-Key": notification.wahaApiKey,
-                }
+                },
             };
             config = this.getAxiosConfigWithProxy(config);
 
             let data = {
-                "session": notification.wahaSession,
-                "chatId": notification.wahaChatId,
-                "text": msg,
+                session: notification.wahaSession,
+                chatId: notification.wahaChatId,
+                text: msg,
             };
 
-            let url = notification.wahaApiUrl.replace(/([^/])\/+$/, "$1") + "/api/sendText";
+            let url =
+                notification.wahaApiUrl.replace(/([^/])\/+$/, "$1") +
+                "/api/sendText";
 
             await axios.post(url, data, config);
 
@@ -35,7 +37,6 @@ class WAHA extends NotificationProvider {
             this.throwGeneralAxiosError(error);
         }
     }
-
 }
 
 module.exports = WAHA;

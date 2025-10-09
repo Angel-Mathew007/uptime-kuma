@@ -13,28 +13,37 @@ class Mattermost extends NotificationProvider {
 
         try {
             let config = this.getAxiosConfigWithProxy({});
-            const mattermostUserName = notification.mattermostusername || "Uptime Kuma";
+            const mattermostUserName =
+                notification.mattermostusername || "Uptime Kuma";
             // If heartbeatJSON is null, assume non monitoring notification (Certificate warning) or testing.
             if (heartbeatJSON == null) {
                 let mattermostTestData = {
                     username: mattermostUserName,
                     text: msg,
                 };
-                await axios.post(notification.mattermostWebhookUrl, mattermostTestData, config);
+                await axios.post(
+                    notification.mattermostWebhookUrl,
+                    mattermostTestData,
+                    config,
+                );
                 return okMsg;
             }
 
             let mattermostChannel;
 
             if (typeof notification.mattermostchannel === "string") {
-                mattermostChannel = notification.mattermostchannel.toLowerCase();
+                mattermostChannel =
+                    notification.mattermostchannel.toLowerCase();
             }
 
             const mattermostIconEmoji = notification.mattermosticonemo;
             let mattermostIconEmojiOnline = "";
             let mattermostIconEmojiOffline = "";
 
-            if (mattermostIconEmoji && typeof mattermostIconEmoji === "string") {
+            if (
+                mattermostIconEmoji &&
+                typeof mattermostIconEmoji === "string"
+            ) {
                 const emojiArray = mattermostIconEmoji.split(" ");
                 if (emojiArray.length >= 2) {
                     mattermostIconEmojiOnline = emojiArray[0];
@@ -99,12 +108,15 @@ class Mattermost extends NotificationProvider {
                     },
                 ],
             };
-            await axios.post(notification.mattermostWebhookUrl, mattermostdata, config);
+            await axios.post(
+                notification.mattermostWebhookUrl,
+                mattermostdata,
+                config,
+            );
             return okMsg;
         } catch (error) {
             this.throwGeneralAxiosError(error);
         }
-
     }
 }
 

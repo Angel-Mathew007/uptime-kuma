@@ -18,7 +18,7 @@ class Webhook extends NotificationProvider {
                 msg,
             };
             let config = {
-                headers: {}
+                headers: {},
             };
 
             if (notification.webhookContentType === "form-data") {
@@ -27,14 +27,19 @@ class Webhook extends NotificationProvider {
                 config.headers = formData.getHeaders();
                 data = formData;
             } else if (notification.webhookContentType === "custom") {
-                data = await this.renderTemplate(notification.webhookCustomBody, msg, monitorJSON, heartbeatJSON);
+                data = await this.renderTemplate(
+                    notification.webhookCustomBody,
+                    msg,
+                    monitorJSON,
+                    heartbeatJSON,
+                );
             }
 
             if (notification.webhookAdditionalHeaders) {
                 try {
                     config.headers = {
                         ...config.headers,
-                        ...JSON.parse(notification.webhookAdditionalHeaders)
+                        ...JSON.parse(notification.webhookAdditionalHeaders),
                     };
                 } catch (err) {
                     throw "Additional Headers is not a valid JSON";
@@ -44,13 +49,10 @@ class Webhook extends NotificationProvider {
             config = this.getAxiosConfigWithProxy(config);
             await axios.post(notification.webhookURL, data, config);
             return okMsg;
-
         } catch (error) {
             this.throwGeneralAxiosError(error);
         }
-
     }
-
 }
 
 module.exports = Webhook;

@@ -1,16 +1,24 @@
 <template>
     <div
         class="tag-wrapper rounded d-inline-flex"
-        :class="{ 'px-3': size == 'normal',
-                  'py-1': size == 'normal',
-                  'm-2': size == 'normal',
-                  'px-2': size == 'sm',
-                  'py-0': size == 'sm',
+        :class="{
+            'px-3': size == 'normal',
+            'py-1': size == 'normal',
+            'm-2': size == 'normal',
+            'px-2': size == 'sm',
+            'py-0': size == 'sm',
         }"
-        :style="{ backgroundColor: item.color, fontSize: size == 'sm' ? '0.7em' : '1em' }"
+        :style="{
+            backgroundColor: item.color,
+            fontSize: size == 'sm' ? '0.7em' : '1em',
+        }"
     >
         <span class="tag-text">{{ displayText }}</span>
-        <span v-if="remove != null" class="ps-1 btn-remove" @click="remove(item)">
+        <span
+            v-if="remove != null"
+            class="ps-1 btn-remove"
+            @click="remove(item)"
+        >
             <font-awesome-icon icon="times" />
         </span>
     </div>
@@ -43,17 +51,21 @@ export default {
         size: {
             type: String,
             default: "normal",
-        }
+        },
     },
     computed: {
         displayText() {
-            if (this.item.value === "" || this.item.value === undefined || this.item.value === null) {
+            if (
+                this.item.value === "" ||
+                this.item.value === undefined ||
+                this.item.value === null
+            ) {
                 return this.item.name;
             } else {
                 return `${this.item.name}: ${this.item.value}`;
             }
-        }
-    }
+        },
+    },
 };
 </script>
 

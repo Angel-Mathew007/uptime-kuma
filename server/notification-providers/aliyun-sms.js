@@ -109,18 +109,20 @@ class AliyunSMS extends NotificationProvider {
                 "*": "%2A",
                 "'": "%27",
                 "(": "%28",
-                ")": "%29"
+                ")": "%29",
             }[m];
         };
 
         for (let key in param2) {
-            let value = encodeURIComponent(param2[key]).replace(/[!*'()]/g, moreEscapesTable);
+            let value = encodeURIComponent(param2[key]).replace(
+                /[!*'()]/g,
+                moreEscapesTable,
+            );
             data.push(`${encodeURIComponent(key)}=${value}`);
         }
 
         let StringToSign = `POST&${encodeURIComponent("/")}&${encodeURIComponent(data.join("&"))}`;
-        return Crypto
-            .createHmac("sha1", `${AccessKeySecret}&`)
+        return Crypto.createHmac("sha1", `${AccessKeySecret}&`)
             .update(Buffer.from(StringToSign))
             .digest("base64");
     }

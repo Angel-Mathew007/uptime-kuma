@@ -1,8 +1,9 @@
 export default {
-
     data() {
         return {
-            system: (window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light",
+            system: window.matchMedia("(prefers-color-scheme: dark)").matches
+                ? "dark"
+                : "light",
             userTheme: localStorage.theme,
             userHeartbeatBar: localStorage.heartbeatBarTheme,
             styleElapsedTime: localStorage.styleElapsedTime,
@@ -14,7 +15,7 @@ export default {
 
     mounted() {
         // Default Light
-        if (! this.userTheme) {
+        if (!this.userTheme) {
             this.userTheme = "auto";
         }
 
@@ -47,7 +48,10 @@ export default {
                 return "light";
             }
 
-            if (this.path.startsWith("/status-page") || this.path.startsWith("/status")) {
+            if (
+                this.path.startsWith("/status-page") ||
+                this.path.startsWith("/status")
+            ) {
                 if (this.statusPageTheme === "auto") {
                     return this.system;
                 }
@@ -62,7 +66,7 @@ export default {
 
         isDark() {
             return this.theme === "dark";
-        }
+        },
     },
 
     watch: {
@@ -91,7 +95,7 @@ export default {
         heartbeatBarTheme(to, from) {
             document.body.classList.remove(from);
             document.body.classList.add(this.heartbeatBarTheme);
-        }
+        },
     },
 
     methods: {
@@ -101,11 +105,14 @@ export default {
          */
         updateThemeColorMeta() {
             if (this.theme === "dark") {
-                document.querySelector("#theme-color").setAttribute("content", "#161B22");
+                document
+                    .querySelector("#theme-color")
+                    .setAttribute("content", "#161B22");
             } else {
-                document.querySelector("#theme-color").setAttribute("content", "#5cdd8b");
+                document
+                    .querySelector("#theme-color")
+                    .setAttribute("content", "#5cdd8b");
             }
-        }
-    }
+        },
+    },
 };
-

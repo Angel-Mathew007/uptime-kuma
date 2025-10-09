@@ -12,7 +12,10 @@ test("Test Uptime Calculator - custom date", async (t) => {
 
     // Test custom date
     UptimeCalculator.currentDate = dayjs.utc("2021-01-01T00:00:00.000Z");
-    assert.strictEqual(c1.getCurrentDate().unix(), dayjs.utc("2021-01-01T00:00:00.000Z").unix());
+    assert.strictEqual(
+        c1.getCurrentDate().unix(),
+        dayjs.utc("2021-01-01T00:00:00.000Z").unix(),
+    );
 });
 
 test("Test update - UP", async (t) => {
@@ -88,7 +91,9 @@ test("Test getDailyKey", async (t) => {
 
     // Test timezone
     c2 = new UptimeCalculator();
-    dailyKey = c2.getDailyKey(dayjs("Sat Dec 23 2023 05:38:39 GMT+0800 (Hong Kong Standard Time)"));
+    dailyKey = c2.getDailyKey(
+        dayjs("Sat Dec 23 2023 05:38:39 GMT+0800 (Hong Kong Standard Time)"),
+    );
     assert.strictEqual(dailyKey, dayjs.utc("2023-12-22").unix());
 });
 
@@ -285,7 +290,6 @@ test("Test get7DayUptime", async (t) => {
     // After 7 days, even if there is no data, the uptime should be still 80%
     uptime = c2.get7Day().uptime;
     assert.strictEqual(uptime, 0.8);
-
 });
 
 test("Test get30DayUptime (1 check per day)", async (t) => {
@@ -299,7 +303,10 @@ test("Test get30DayUptime (1 check per day)", async (t) => {
     let down = 0;
     let flip = true;
     for (let i = 0; i < 30; i++) {
-        UptimeCalculator.currentDate = UptimeCalculator.currentDate.add(1, "day");
+        UptimeCalculator.currentDate = UptimeCalculator.currentDate.add(
+            1,
+            "day",
+        );
 
         if (flip) {
             await c2.update(UP);
@@ -330,7 +337,10 @@ test("Test get1YearUptime (1 check per day)", async (t) => {
 
     let flip = true;
     for (let i = 0; i < 365; i++) {
-        UptimeCalculator.currentDate = UptimeCalculator.currentDate.add(1, "day");
+        UptimeCalculator.currentDate = UptimeCalculator.currentDate.add(
+            1,
+            "day",
+        );
 
         if (flip) {
             await c2.update(UP);
@@ -352,7 +362,8 @@ test("Test get1YearUptime (1 check per day)", async (t) => {
  * @returns {{rss: string, heapTotal: string, heapUsed: string, external: string}} Current memory usage
  */
 function memoryUsage() {
-    const formatMemoryUsage = (data) => `${Math.round(data / 1024 / 1024 * 100) / 100} MB`;
+    const formatMemoryUsage = (data) =>
+        `${Math.round((data / 1024 / 1024) * 100) / 100} MB`;
     const memoryData = process.memoryUsage();
 
     return {
@@ -364,7 +375,6 @@ function memoryUsage() {
 }
 
 test("Worst case", async (t) => {
-
     // Disable on GitHub Actions, as it is not stable on it
     if (process.env.GITHUB_ACTIONS) {
         return;
@@ -385,7 +395,10 @@ test("Worst case", async (t) => {
 
         // Simulate 1s interval for a year
         for (let i = 0; i < 365 * 24 * 60 * 60; i += interval) {
-            UptimeCalculator.currentDate = UptimeCalculator.currentDate.add(interval, "second");
+            UptimeCalculator.currentDate = UptimeCalculator.currentDate.add(
+                interval,
+                "second",
+            );
 
             //Randomly UP, DOWN, MAINTENANCE, PENDING
             let rand = Math.random();
@@ -411,7 +424,10 @@ test("Worst case", async (t) => {
                 }
             }
         }
-        console.log("Final Date: ", UptimeCalculator.currentDate.format("YYYY-MM-DD HH:mm:ss"));
+        console.log(
+            "Final Date: ",
+            UptimeCalculator.currentDate.format("YYYY-MM-DD HH:mm:ss"),
+        );
         console.log("Memory usage before preparation", memoryUsage());
 
         assert.strictEqual(c.minutelyUptimeDataList.length(), 1440);
@@ -421,5 +437,4 @@ test("Worst case", async (t) => {
     await t.test("get1YearUptime()", async () => {
         assert.strictEqual(c.get1Year().uptime, up / (up + down));
     });
-
 });

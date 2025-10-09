@@ -1,11 +1,5 @@
 const NotificationProvider = require("./notification-provider");
-const {
-    finalizeEvent,
-    Relay,
-    kinds,
-    nip04,
-    nip19,
-} = require("nostr-tools");
+const { finalizeEvent, Relay, kinds, nip04, nip19 } = require("nostr-tools");
 
 // polyfills for node versions
 const semver = require("semver");
@@ -30,16 +24,22 @@ class Nostr extends NotificationProvider {
         const createdAt = Math.floor(Date.now() / 1000);
 
         const senderPrivateKey = await this.getPrivateKey(notification.sender);
-        const recipientsPublicKeys = await this.getPublicKeys(notification.recipients);
+        const recipientsPublicKeys = await this.getPublicKeys(
+            notification.recipients,
+        );
 
         // Create NIP-04 encrypted direct message event for each recipient
         const events = [];
         for (const recipientPublicKey of recipientsPublicKeys) {
-            const ciphertext = await nip04.encrypt(senderPrivateKey, recipientPublicKey, msg);
+            const ciphertext = await nip04.encrypt(
+                senderPrivateKey,
+                recipientPublicKey,
+                msg,
+            );
             let event = {
                 kind: kinds.EncryptedDirectMessage,
                 created_at: createdAt,
-                tags: [[ "p", recipientPublicKey ]],
+                tags: [["p", recipientPublicKey]],
                 content: ciphertext,
             };
             const signedEvent = finalizeEvent(event, senderPrivateKey);
@@ -95,7 +95,9 @@ class Nostr extends NotificationProvider {
             const { data } = senderDecodeResult;
             return data;
         } catch (error) {
-            throw new Error(`Failed to decode private key for sender ${sender}: ${error.message}`);
+            throw new Error(
+                `Failed to decode private key for sender ${sender}: ${error.message}`,
+            );
         }
     }
 
@@ -117,7 +119,9 @@ class Nostr extends NotificationProvider {
                     throw new Error(`Recipient ${recipient} is not an npub`);
                 }
             } catch (error) {
-                throw new Error(`Error decoding recipient ${recipient}: ${error}`);
+                throw new Error(
+                    `Error decoding recipient ${recipient}: ${error}`,
+                );
             }
         }
         return publicKeys;

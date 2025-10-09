@@ -13,7 +13,7 @@ class Brevo extends NotificationProvider {
         try {
             let config = {
                 headers: {
-                    "Accept": "application/json",
+                    Accept: "application/json",
                     "Content-Type": "application/json",
                     "api-key": notification.brevoApiKey,
                 },
@@ -25,11 +25,13 @@ class Brevo extends NotificationProvider {
             let data = {
                 sender: {
                     email: notification.brevoFromEmail.trim(),
-                    name: notification.brevoFromName || "Uptime Kuma"
+                    name: notification.brevoFromName || "Uptime Kuma",
                 },
                 to: to,
-                subject: notification.brevoSubject || "Notification from Your Uptime Kuma",
-                htmlContent: `<html><head></head><body><p>${msg.replace(/\n/g, "<br>")}</p></body></html>`
+                subject:
+                    notification.brevoSubject ||
+                    "Notification from Your Uptime Kuma",
+                htmlContent: `<html><head></head><body><p>${msg.replace(/\n/g, "<br>")}</p></body></html>`,
             };
 
             if (notification.brevoCcEmail) {
@@ -47,7 +49,7 @@ class Brevo extends NotificationProvider {
             let result = await axios.post(
                 "https://api.brevo.com/v3/smtp/email",
                 data,
-                config
+                config,
             );
             if (result.status === 201) {
                 return okMsg;

@@ -37,11 +37,11 @@ class SendGrid extends NotificationProvider {
             }
 
             let data = {
-                personalizations: [ personalizations ],
+                personalizations: [personalizations],
                 from: { email: notification.sendgridFromEmail.trim() },
                 subject:
-          notification.sendgridSubject ||
-          "Notification from Your Uptime Kuma",
+                    notification.sendgridSubject ||
+                    "Notification from Your Uptime Kuma",
                 content: [
                     {
                         type: "text/plain",
@@ -53,7 +53,7 @@ class SendGrid extends NotificationProvider {
             await axios.post(
                 "https://api.sendgrid.com/v3/mail/send",
                 data,
-                config
+                config,
             );
             return okMsg;
         } catch (error) {

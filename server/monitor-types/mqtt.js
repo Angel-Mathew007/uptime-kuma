@@ -1,7 +1,9 @@
+// server/monitor-types/mqtt.js
 const { MonitorType } = require("./monitor-type");
 const { log, UP } = require("../../src/util");
-const mqtt = require("mqtt");
+const mqtt = require("mqtt"); // only declare once
 const jsonata = require("jsonata");
+const fs = require("fs"); // for TLS files if needed
 
 class MqttMonitorType extends MonitorType {
     name = "mqtt";
@@ -18,9 +20,8 @@ class MqttMonitorType extends MonitorType {
             websocketPath: monitor.mqttWebsocketPath,
         });
 
-        if (monitor.mqttCheckType == null || monitor.mqttCheckType === "") {
-            // use old default
-            monitor.mqttCheckType = "keyword";
+        if (!monitor.mqttCheckType || monitor.mqttCheckType === "") {
+            monitor.mqttCheckType = "keyword"; // default
         }
 
         if (monitor.mqttCheckType === "keyword") {
@@ -28,14 +29,12 @@ class MqttMonitorType extends MonitorType {
                 heartbeat.msg = `Topic: ${monitor.mqttTopic}; Message: ${receivedMessage}`;
                 heartbeat.status = UP;
             } else {
-                throw Error(`Message Mismatch - Topic: ${monitor.mqttTopic}; Message: ${receivedMessage}`);
+                throw new Error(`Message Mismatch - Topic: ${monitor.mqttTopic}; Message: ${receivedMessage}`);
             }
         } else if (monitor.mqttCheckType === "json-query") {
             const parsedMessage = JSON.parse(receivedMessage);
-
-            let expression = jsonata(monitor.jsonPath);
-
-            let result = await expression.evaluate(parsedMessage);
+            const expression = jsonata(monitor.jsonPath);
+            const result = await expression.evaluate(parsedMessage);
 
             if (result?.toString() === monitor.expectedValue) {
                 heartbeat.msg = "Message received, expected value is found";
@@ -44,23 +43,17 @@ class MqttMonitorType extends MonitorType {
                 throw new Error("Message received but value is not equal to expected value, value was: [" + result + "]");
             }
         } else {
-            throw Error("Unknown MQTT Check Type");
+            throw new Error("Unknown MQTT Check Type");
         }
     }
 
     /**
      * Connect to MQTT Broker, subscribe to topic and receive message as String
-     * @param {string} hostname Hostname / address of machine to test
-     * @param {string} topic MQTT topic
-     * @param {object} options MQTT options. Contains port, username,
-     * password, websocketPath and interval (interval defaults to 20)
-     * @returns {Promise<string>} Received MQTT message
      */
     mqttAsync(hostname, topic, options = {}) {
         return new Promise((resolve, reject) => {
             const { port, username, password, websocketPath, interval = 20 } = options;
 
-            // Adds MQTT protocol to the hostname if not already present
             if (!/^(?:http|mqtt|ws)s?:\/\//.test(hostname)) {
                 hostname = "mqtt://" + hostname;
             }
@@ -71,19 +64,14 @@ class MqttMonitorType extends MonitorType {
                 reject(new Error("Timeout, Message not received"));
             }, interval * 1000 * 0.8);
 
-            // Construct the URL based on protocol
             let mqttUrl = `${hostname}:${port}`;
             if (hostname.startsWith("ws://") || hostname.startsWith("wss://")) {
-                if (websocketPath && !websocketPath.startsWith("/")) {
-                    mqttUrl = `${hostname}:${port}/${websocketPath || ""}`;
-                } else {
-                    mqttUrl = `${hostname}:${port}${websocketPath || ""}`;
-                }
+                mqttUrl = `${hostname}:${port}${websocketPath ? (websocketPath.startsWith("/") ? websocketPath : "/" + websocketPath) : ""}`;
             }
 
             log.debug("mqtt", `MQTT connecting to ${mqttUrl}`);
 
-            let client = mqtt.connect(mqttUrl, {
+            const client = mqtt.connect(mqttUrl, {
                 username,
                 password,
                 clientId: "uptime-kuma_" + Math.random().toString(16).substr(2, 8)
@@ -91,7 +79,6 @@ class MqttMonitorType extends MonitorType {
 
             client.on("connect", () => {
                 log.debug("mqtt", "MQTT connected");
-
                 try {
                     client.subscribe(topic, () => {
                         log.debug("mqtt", "MQTT subscribed to topic");
@@ -116,11 +103,44 @@ class MqttMonitorType extends MonitorType {
                     resolve(message.toString("utf8"));
                 }
             });
-
         });
     }
 }
 
+/**
+ * Optional helper function to create MQTT client with TLS support
+ */
+function createMQTTClient(config) {
+    const options = {
+        username: config.username,
+        password: config.password,
+        reconnectPeriod: config.reconnectPeriod || 5000,
+    };
+
+    if (config.tlsEnabled) {
+        options.protocol = "mqtts"; // secure MQTT
+        options.rejectUnauthorized = config.rejectUnauthorized ?? true;
+
+        if (config.caFile) options.ca = [fs.readFileSync(config.caFile)];
+        if (config.certFile && config.keyFile) {
+            options.cert = fs.readFileSync(config.certFile);
+            options.key = fs.readFileSync(config.keyFile);
+        }
+        if (config.alpnProtocols) options.ALPNProtocols = config.alpnProtocols;
+    }
+
+    const client = mqtt.connect(config.url, options);
+
+    client.on("connect", () => console.log("Connected to MQTT broker"));
+
+    client.on("message", (topic, message) => {
+        // Reset timeout logic if needed
+    });
+
+    return client;
+}
+
 module.exports = {
     MqttMonitorType,
+    createMQTTClient,
 };

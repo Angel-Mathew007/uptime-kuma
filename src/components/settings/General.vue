@@ -6,7 +6,11 @@
                 <label for="timezone" class="form-label">
                     {{ $t("Display Timezone") }}
                 </label>
-                <select id="timezone" v-model="$root.userTimezone" class="form-select">
+                <select
+                    id="timezone"
+                    v-model="$root.userTimezone"
+                    class="form-select"
+                >
                     <option value="auto">
                         {{ $t("Auto") }}: {{ guessTimezone }}
                     </option>
@@ -25,7 +29,11 @@
                 <label for="timezone" class="form-label">
                     {{ $t("Server Timezone") }}
                 </label>
-                <select id="timezone" v-model="settings.serverTimezone" class="form-select">
+                <select
+                    id="timezone"
+                    v-model="settings.serverTimezone"
+                    class="form-select"
+                >
                     <option value="UTC">UTC</option>
                     <option
                         v-for="(timezone, index) in timezoneList"
@@ -92,7 +100,11 @@
                     </label>
                 </div>
 
-                <div v-for="statusPage in $root.statusPageList" :key="statusPage.id" class="form-check">
+                <div
+                    v-for="statusPage in $root.statusPageList"
+                    :key="statusPage.id"
+                    class="form-check"
+                >
                     <input
                         :id="'status-page-' + statusPage.id"
                         v-model="settings.entryPage"
@@ -102,7 +114,10 @@
                         :value="'statusPage-' + statusPage.slug"
                         required
                     />
-                    <label class="form-check-label" :for="'status-page-' + statusPage.id">
+                    <label
+                        class="form-check-label"
+                        :for="'status-page-' + statusPage.id"
+                    >
                         {{ $t("Status Page") }} - {{ statusPage.title }}
                     </label>
                 </div>
@@ -124,7 +139,11 @@
                         pattern="https?://.+"
                         autocomplete="new-password"
                     />
-                    <button class="btn btn-outline-primary" type="button" @click="autoGetPrimaryBaseURL">
+                    <button
+                        class="btn btn-outline-primary"
+                        type="button"
+                        @click="autoGetPrimaryBaseURL"
+                    >
                         {{ $t("Auto Get") }}
                     </button>
                 </div>
@@ -201,7 +220,11 @@
                         name="primaryBaseURL"
                         :placeholder="$t('chromeExecutableAutoDetect')"
                     />
-                    <button class="btn btn-outline-primary" type="button" @click="testChrome">
+                    <button
+                        class="btn btn-outline-primary"
+                        type="button"
+                        @click="testChrome"
+                    >
                         {{ $t("Test") }}
                     </button>
                 </div>
@@ -249,7 +272,7 @@ export default {
         },
         guessTimezone() {
             return dayjs.tz.guess();
-        }
+        },
     },
 
     methods: {
@@ -266,18 +289,20 @@ export default {
          * @returns {void}
          */
         autoGetPrimaryBaseURL() {
-            this.settings.primaryBaseURL = location.protocol + "//" + location.host;
+            this.settings.primaryBaseURL =
+                location.protocol + "//" + location.host;
         },
         /**
          * Test the chrome executable
          * @returns {void}
          */
         testChrome() {
-            this.$root.getSocket().emit("testChrome", this.settings.chromeExecutable, (res) => {
-                this.$root.toastRes(res);
-            });
+            this.$root
+                .getSocket()
+                .emit("testChrome", this.settings.chromeExecutable, (res) => {
+                    this.$root.toastRes(res);
+                });
         },
     },
 };
 </script>
-

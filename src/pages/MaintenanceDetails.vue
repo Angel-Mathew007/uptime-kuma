@@ -3,13 +3,24 @@
         <div v-if="maintenance">
             <h1>{{ maintenance.title }}</h1>
             <p class="url">
-                <span>{{ $t("Start") }}: {{ $root.datetimeMaintenance(maintenance.start_date) }}</span>
-                <br>
-                <span>{{ $t("End") }}: {{ $root.datetimeMaintenance(maintenance.end_date) }}</span>
+                <span
+                    >{{ $t("Start") }}:
+                    {{
+                        $root.datetimeMaintenance(maintenance.start_date)
+                    }}</span
+                >
+                <br />
+                <span
+                    >{{ $t("End") }}:
+                    {{ $root.datetimeMaintenance(maintenance.end_date) }}</span
+                >
             </p>
 
-            <div class="functions" style="margin-top: 10px;">
-                <router-link :to=" '/maintenance/edit/' + maintenance.id " class="btn btn-secondary">
+            <div class="functions" style="margin-top: 10px">
+                <router-link
+                    :to="'/maintenance/edit/' + maintenance.id"
+                    class="btn btn-secondary"
+                >
                     <font-awesome-icon icon="edit" /> {{ $t("Edit") }}
                 </router-link>
                 <button class="btn btn-danger" @click="deleteDialog">
@@ -17,23 +28,71 @@
                 </button>
             </div>
 
-            <label for="description" class="form-label" style="margin-top: 20px;">{{ $t("Description") }}</label>
-            <textarea id="description" v-model="maintenance.description" class="form-control" disabled></textarea>
+            <label
+                for="description"
+                class="form-label"
+                style="margin-top: 20px"
+                >{{ $t("Description") }}</label
+            >
+            <textarea
+                id="description"
+                v-model="maintenance.description"
+                class="form-control"
+                disabled
+            ></textarea>
 
-            <label for="affected_monitors" class="form-label" style="margin-top: 20px;">{{ $t("Affected Monitors") }}</label>
-            <br>
-            <button v-for="monitor in affectedMonitors" :key="monitor.id" class="btn btn-monitor" style="margin: 5px; cursor: auto; color: white; font-weight: 500;">
+            <label
+                for="affected_monitors"
+                class="form-label"
+                style="margin-top: 20px"
+                >{{ $t("Affected Monitors") }}</label
+            >
+            <br />
+            <button
+                v-for="monitor in affectedMonitors"
+                :key="monitor.id"
+                class="btn btn-monitor"
+                style="
+                    margin: 5px;
+                    cursor: auto;
+                    color: white;
+                    font-weight: 500;
+                "
+            >
                 {{ monitor }}
             </button>
             <br />
 
-            <label for="selected_status_pages" class="form-label" style="margin-top: 20px;">{{ $t("Show this Maintenance Message on which Status Pages") }}</label>
-            <br>
-            <button v-for="statusPage in selectedStatusPages" :key="statusPage.id" class="btn btn-monitor" style="margin: 5px; cursor: auto; color: white; font-weight: 500;">
+            <label
+                for="selected_status_pages"
+                class="form-label"
+                style="margin-top: 20px"
+                >{{
+                    $t("Show this Maintenance Message on which Status Pages")
+                }}</label
+            >
+            <br />
+            <button
+                v-for="statusPage in selectedStatusPages"
+                :key="statusPage.id"
+                class="btn btn-monitor"
+                style="
+                    margin: 5px;
+                    cursor: auto;
+                    color: white;
+                    font-weight: 500;
+                "
+            >
                 {{ statusPage }}
             </button>
 
-            <Confirm ref="confirmDelete" btn-style="btn-danger" :yes-text="$t('Yes')" :no-text="$t('No')" @yes="deleteMaintenance">
+            <Confirm
+                ref="confirmDelete"
+                btn-style="btn-danger"
+                :yes-text="$t('Yes')"
+                :no-text="$t('No')"
+                @yes="deleteMaintenance"
+            >
                 {{ $t("deleteMaintenanceMsg") }}
             </Confirm>
         </div>
@@ -70,21 +129,33 @@ export default {
          * @returns {void}
          */
         init() {
-            this.$root.getSocket().emit("getMonitorMaintenance", this.$route.params.id, (res) => {
-                if (res.ok) {
-                    this.affectedMonitors = Object.values(res.monitors).map(monitor => monitor.name);
-                } else {
-                    toast.error(res.msg);
-                }
-            });
+            this.$root
+                .getSocket()
+                .emit("getMonitorMaintenance", this.$route.params.id, (res) => {
+                    if (res.ok) {
+                        this.affectedMonitors = Object.values(res.monitors).map(
+                            (monitor) => monitor.name,
+                        );
+                    } else {
+                        toast.error(res.msg);
+                    }
+                });
 
-            this.$root.getSocket().emit("getMaintenanceStatusPage", this.$route.params.id, (res) => {
-                if (res.ok) {
-                    this.selectedStatusPages = Object.values(res.statusPages).map(statusPage => statusPage.title);
-                } else {
-                    toast.error(res.msg);
-                }
-            });
+            this.$root
+                .getSocket()
+                .emit(
+                    "getMaintenanceStatusPage",
+                    this.$route.params.id,
+                    (res) => {
+                        if (res.ok) {
+                            this.selectedStatusPages = Object.values(
+                                res.statusPages,
+                            ).map((statusPage) => statusPage.title);
+                        } else {
+                            toast.error(res.msg);
+                        }
+                    },
+                );
         },
 
         /**
@@ -116,7 +187,8 @@ export default {
     .functions {
         text-align: center;
 
-        button, a {
+        button,
+        a {
             margin-left: 10px !important;
             margin-right: 10px !important;
         }
@@ -148,7 +220,8 @@ export default {
 }
 
 .functions {
-    button, a {
+    button,
+    a {
         margin-right: 20px;
     }
 }
@@ -165,5 +238,4 @@ textarea {
 .dark .btn-monitor {
     color: #020b05 !important;
 }
-
 </style>

@@ -18,7 +18,6 @@ export default {
         };
     },
     async mounted() {
-
         // There are only 3 cases that could come in here.
         // 1. Matched status Page domain name
         // 2. Vue Frontend Dev
@@ -30,11 +29,13 @@ export default {
             if (res.type === "statusPageMatchedDomain") {
                 this.statusPageSlug = res.statusPageSlug;
                 this.$root.forceStatusPageTheme = true;
-
-            } else if (res.type === "entryPage") {          // Dev only. For production, the logic is in the server side
+            } else if (res.type === "entryPage") {
+                // Dev only. For production, the logic is in the server side
                 const entryPage = res.entryPage;
                 if (entryPage?.startsWith("statusPage-")) {
-                    this.$router.push("/status/" + entryPage.replace("statusPage-", ""));
+                    this.$router.push(
+                        "/status/" + entryPage.replace("statusPage-", ""),
+                    );
                 } else {
                     // should the old setting style still exist here?
                     this.$router.push("/dashboard");
@@ -45,10 +46,10 @@ export default {
                 this.$router.push("/dashboard");
             }
         } catch (e) {
-            alert("Cannot connect to the backend server. Did you start the backend server? (npm run start-server-dev)");
+            alert(
+                "Cannot connect to the backend server. Did you start the backend server? (npm run start-server-dev)",
+            );
         }
-
     },
-
 };
 </script>

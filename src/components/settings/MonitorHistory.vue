@@ -2,11 +2,7 @@
     <div>
         <div class="my-4">
             <label for="keepDataPeriodDays" class="form-label">
-                {{
-                    $t("clearDataOlderThan", [
-                        settings.keepDataPeriodDays,
-                    ])
-                }}
+                {{ $t("clearDataOlderThan", [settings.keepDataPeriodDays]) }}
                 {{ $t("infiniteRetention") }}
             </label>
             <input
@@ -23,16 +19,27 @@
             </div>
         </div>
         <div class="my-4">
-            <button class="btn btn-primary" type="button" @click="saveSettings()">
+            <button
+                class="btn btn-primary"
+                type="button"
+                @click="saveSettings()"
+            >
                 {{ $t("Save") }}
             </button>
         </div>
         <div class="my-4">
             <div v-if="$root.info.dbType === 'sqlite'" class="my-3">
-                <button class="btn btn-outline-info me-2" @click="shrinkDatabase">
+                <button
+                    class="btn btn-outline-info me-2"
+                    @click="shrinkDatabase"
+                >
                     {{ $t("Shrink Database") }} ({{ databaseSizeDisplay }})
                 </button>
-                <i18n-t tag="div" keypath="shrinkDatabaseDescriptionSqlite" class="form-text mt-2 mb-4 ms-2">
+                <i18n-t
+                    tag="div"
+                    keypath="shrinkDatabaseDescriptionSqlite"
+                    class="form-text mt-2 mb-4 ms-2"
+                >
                     <template #vacuum>
                         <code>VACUUM</code>
                     </template>

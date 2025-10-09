@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test";
 import { login, restoreSqliteSnapshot, screenshot } from "../util-test";
 
 test.describe("Example Spec", () => {
-
     test.beforeEach(async ({ page }) => {
         await restoreSqliteSnapshot(page);
     });
@@ -24,16 +23,21 @@ test.describe("Example Spec", () => {
         await page.getByTestId("save-button").click();
         await page.waitForURL("/dashboard/*"); // wait for the monitor to be created
 
-        await expect(page.getByTestId("monitor-list")).toContainText("example.com");
+        await expect(page.getByTestId("monitor-list")).toContainText(
+            "example.com",
+        );
         await screenshot(testInfo, page);
     });
 
-    test("database is reset after previous test", async ({ page }, testInfo) => {
+    test("database is reset after previous test", async ({
+        page,
+    }, testInfo) => {
         await page.goto("./dashboard");
         await login(page);
 
-        await expect(page.getByTestId("monitor-list")).not.toContainText("example.com");
+        await expect(page.getByTestId("monitor-list")).not.toContainText(
+            "example.com",
+        );
         await screenshot(testInfo, page);
     });
-
 });

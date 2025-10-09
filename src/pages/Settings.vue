@@ -27,7 +27,15 @@
                     </router-link>
 
                     <!-- Logout Button -->
-                    <a v-if="$root.isMobile && $root.loggedIn && $root.socket.token !== 'autoLogin'" class="logout" @click.prevent="$root.logout">
+                    <a
+                        v-if="
+                            $root.isMobile &&
+                            $root.loggedIn &&
+                            $root.socket.token !== 'autoLogin'
+                        "
+                        class="logout"
+                        @click.prevent="$root.logout"
+                    >
                         <div class="menu-item">
                             <font-awesome-icon icon="sign-out-alt" />
                             {{ $t("Logout") }}
@@ -111,7 +119,7 @@ export default {
                     title: this.$t("Security"),
                 },
                 "api-keys": {
-                    title: this.$t("API Keys")
+                    title: this.$t("API Keys"),
                 },
                 proxies: {
                     title: this.$t("Proxies"),
@@ -126,7 +134,7 @@ export default {
     watch: {
         "$root.isMobile"() {
             this.loadGeneralPage();
-        }
+        },
     },
 
     mounted() {
@@ -135,7 +143,6 @@ export default {
     },
 
     methods: {
-
         /**
          * Load the general settings page
          * For desktop only, on mobile do nothing
@@ -176,7 +183,7 @@ export default {
                 }
 
                 if (this.settings.tlsExpiryNotifyDays === undefined) {
-                    this.settings.tlsExpiryNotifyDays = [ 7, 14, 21 ];
+                    this.settings.tlsExpiryNotifyDays = [7, 14, 21];
                 }
 
                 if (this.settings.trustProxy === undefined) {
@@ -203,14 +210,21 @@ export default {
         saveSettings(callback, currentPassword) {
             let valid = this.validateSettings();
             if (valid.success) {
-                this.$root.getSocket().emit("setSettings", this.settings, currentPassword, (res) => {
-                    this.$root.toastRes(res);
-                    this.loadSettings();
+                this.$root
+                    .getSocket()
+                    .emit(
+                        "setSettings",
+                        this.settings,
+                        currentPassword,
+                        (res) => {
+                            this.$root.toastRes(res);
+                            this.loadSettings();
 
-                    if (callback) {
-                        callback();
-                    }
-                });
+                            if (callback) {
+                                callback();
+                            }
+                        },
+                    );
             } else {
                 this.$root.toastError(valid.msg);
             }
@@ -232,7 +246,7 @@ export default {
                 msg: "",
             };
         },
-    }
+    },
 };
 </script>
 

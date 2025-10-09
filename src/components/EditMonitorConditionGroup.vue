@@ -1,7 +1,13 @@
 <template>
     <div class="condition-group mb-3" data-testid="condition-group">
         <div class="d-flex">
-            <select v-if="!isFirst" v-model="model.andOr" class="form-select" style="width: auto;" data-testid="condition-group-and-or">
+            <select
+                v-if="!isFirst"
+                v-model="model.andOr"
+                class="form-select"
+                style="width: auto"
+                data-testid="condition-group-and-or"
+            >
                 <option value="and">{{ $t("and") }}</option>
                 <option value="or">{{ $t("or") }}</option>
             </select>
@@ -9,7 +15,10 @@
 
         <div class="condition-group-inner mt-2 pa-2">
             <div class="condition-group-conditions">
-                <template v-for="(child, childIndex) in model.children" :key="childIndex">
+                <template
+                    v-for="(child, childIndex) in model.children"
+                    :key="childIndex"
+                >
                     <EditMonitorConditionGroup
                         v-if="child.type === 'group'"
                         v-model="model.children[childIndex]"
@@ -32,10 +41,20 @@
             </div>
 
             <div class="condition-group-actions mt-3">
-                <button class="btn btn-outline-secondary me-2" type="button" data-testid="add-condition-button" @click="addCondition">
+                <button
+                    class="btn btn-outline-secondary me-2"
+                    type="button"
+                    data-testid="add-condition-button"
+                    @click="addCondition"
+                >
                     {{ $t("conditionAdd") }}
                 </button>
-                <button class="btn btn-outline-secondary me-2" type="button" data-testid="add-group-button" @click="addGroup">
+                <button
+                    class="btn btn-outline-secondary me-2"
+                    type="button"
+                    data-testid="add-group-button"
+                    @click="addGroup"
+                >
                     {{ $t("conditionAddGroup") }}
                 </button>
                 <button
@@ -104,7 +123,7 @@ export default {
         },
     },
 
-    emits: [ "update:modelValue", "remove" ],
+    emits: ["update:modelValue", "remove"],
 
     computed: {
         model: {
@@ -113,19 +132,19 @@ export default {
             },
             set(value) {
                 this.$emit("update:modelValue", value);
-            }
-        }
+            },
+        },
     },
 
     methods: {
         addGroup() {
-            const conditions = [ ...this.model.children ];
+            const conditions = [...this.model.children];
             conditions.push(this.getNewGroup());
             this.model.children = conditions;
         },
 
         addCondition() {
-            const conditions = [ ...this.model.children ];
+            const conditions = [...this.model.children];
             conditions.push(this.getNewCondition());
             this.model.children = conditions;
         },

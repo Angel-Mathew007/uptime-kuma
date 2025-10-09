@@ -12,7 +12,8 @@ const { default: axios } = require("axios");
 
 // bark is an APN bridge that sends notifications to Apple devices.
 
-const barkNotificationAvatar = "https://github.com/louislam/uptime-kuma/raw/master/public/icon.png";
+const barkNotificationAvatar =
+    "https://github.com/louislam/uptime-kuma/raw/master/public/icon.png";
 const successMessage = "Successes!";
 
 class Bark extends NotificationProvider {
@@ -29,19 +30,42 @@ class Bark extends NotificationProvider {
             barkEndpoint = barkEndpoint.substring(0, barkEndpoint.length - 1);
         }
 
-        if (msg != null && heartbeatJSON != null && heartbeatJSON["status"] === UP) {
+        if (
+            msg != null &&
+            heartbeatJSON != null &&
+            heartbeatJSON["status"] === UP
+        ) {
             let title = "UptimeKuma Monitor Up";
-            return await this.postNotification(notification, title, msg, barkEndpoint);
+            return await this.postNotification(
+                notification,
+                title,
+                msg,
+                barkEndpoint,
+            );
         }
 
-        if (msg != null && heartbeatJSON != null && heartbeatJSON["status"] === DOWN) {
+        if (
+            msg != null &&
+            heartbeatJSON != null &&
+            heartbeatJSON["status"] === DOWN
+        ) {
             let title = "UptimeKuma Monitor Down";
-            return await this.postNotification(notification, title, msg, barkEndpoint);
+            return await this.postNotification(
+                notification,
+                title,
+                msg,
+                barkEndpoint,
+            );
         }
 
         if (msg != null) {
             let title = "UptimeKuma Message";
-            return await this.postNotification(notification, title, msg, barkEndpoint);
+            return await this.postNotification(
+                notification,
+                title,
+                msg,
+                barkEndpoint,
+            );
         }
     }
 
@@ -82,7 +106,9 @@ class Bark extends NotificationProvider {
             throw new Error("Bark notification failed with invalid response!");
         }
         if (result.status < 200 || result.status >= 300) {
-            throw new Error("Bark notification failed with status code " + result.status);
+            throw new Error(
+                "Bark notification failed with status code " + result.status,
+            );
         }
     }
 
@@ -97,20 +123,30 @@ class Bark extends NotificationProvider {
     async postNotification(notification, title, subtitle, endpoint) {
         let result;
         let config = this.getAxiosConfigWithProxy({});
-        if (notification.apiVersion === "v1" || notification.apiVersion == null) {
+        if (
+            notification.apiVersion === "v1" ||
+            notification.apiVersion == null
+        ) {
             // url encode title and subtitle
             title = encodeURIComponent(title);
             subtitle = encodeURIComponent(subtitle);
             const params = this.additionalParameters(notification);
-            result = await axios.get(`${endpoint}/${title}/${subtitle}${params}`, config);
+            result = await axios.get(
+                `${endpoint}/${title}/${subtitle}${params}`,
+                config,
+            );
         } else {
-            result = await axios.post(`${endpoint}/push`, {
-                title,
-                body: subtitle,
-                icon: barkNotificationAvatar,
-                sound: notification.barkSound || "telegraph", // default sound is telegraph
-                group: notification.barkGroup || "UptimeKuma", // default group is UptimeKuma
-            }, config);
+            result = await axios.post(
+                `${endpoint}/push`,
+                {
+                    title,
+                    body: subtitle,
+                    icon: barkNotificationAvatar,
+                    sound: notification.barkSound || "telegraph", // default sound is telegraph
+                    group: notification.barkGroup || "UptimeKuma", // default group is UptimeKuma
+                },
+                config,
+            );
         }
         this.checkResult(result);
         if (result.statusText != null) {

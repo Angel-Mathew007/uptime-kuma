@@ -3,7 +3,7 @@
         <!-- Access Token Input -->
         <div class="mb-3">
             <label for="onechat-access-token" class="form-label">
-                OneChat Access Token<span style="color: red;"><sup>*</sup></span>
+                OneChat Access Token<span style="color: red"><sup>*</sup></span>
             </label>
             <HiddenInput
                 id="onechat-access-token"
@@ -19,7 +19,8 @@
         <!-- Receiver ID Input -->
         <div class="mb-3">
             <label for="onechat-receiver-id" class="form-label">
-                {{ $t("OneChatUserIdOrGroupId") }}<span style="color: red;"><sup>*</sup></span>
+                {{ $t("OneChatUserIdOrGroupId")
+                }}<span style="color: red"><sup>*</sup></span>
             </label>
             <input
                 id="onechat-receiver-id"
@@ -33,7 +34,8 @@
         <!-- Bot ID Input -->
         <div class="mb-3">
             <label for="onechat-bot-id" class="form-label">
-                {{ $t("OneChatBotId") }}<span style="color: red;"><sup>*</sup></span>
+                {{ $t("OneChatBotId")
+                }}<span style="color: red"><sup>*</sup></span>
             </label>
             <input
                 id="onechat-bot-id"
@@ -47,7 +49,9 @@
         <!-- Document Link -->
         <div class="form-text">
             <i18n-t tag="p" keypath="Read more:">
-                <a href="https://chat-develop.one.th/docs" target="_blank">https://chat-develop.one.th/docs</a>
+                <a href="https://chat-develop.one.th/docs" target="_blank"
+                    >https://chat-develop.one.th/docs</a
+                >
             </i18n-t>
         </div>
     </div>

@@ -4,11 +4,21 @@
             <!-- Change Password -->
             <template v-if="!settings.disableAuth">
                 <p>
-                    {{ $t("Current User") }}: <strong>{{ $root.username }}</strong>
-                    <button v-if="! settings.disableAuth" id="logout-btn" class="btn btn-danger ms-4 me-2 mb-2" @click="$root.logout">{{ $t("Logout") }}</button>
+                    {{ $t("Current User") }}:
+                    <strong>{{ $root.username }}</strong>
+                    <button
+                        v-if="!settings.disableAuth"
+                        id="logout-btn"
+                        class="btn btn-danger ms-4 me-2 mb-2"
+                        @click="$root.logout"
+                    >
+                        {{ $t("Logout") }}
+                    </button>
                 </p>
 
-                <h5 class="my-4 settings-subheading">{{ $t("Change Password") }}</h5>
+                <h5 class="my-4 settings-subheading">
+                    {{ $t("Change Password") }}
+                </h5>
                 <form class="mb-3" @submit.prevent="savePassword">
                     <div class="mb-3">
                         <label for="current-password" class="form-label">
@@ -64,7 +74,7 @@
                 </form>
             </template>
 
-            <div v-if="! settings.disableAuth" class="mt-5 mb-3">
+            <div v-if="!settings.disableAuth" class="mt-5 mb-3">
                 <h5 class="my-4 settings-subheading">
                     {{ $t("Two Factor Authentication") }}
                 </h5>
@@ -84,23 +94,45 @@
                 <h5 class="my-4 settings-subheading">{{ $t("Advanced") }}</h5>
 
                 <div class="mb-4">
-                    <button v-if="settings.disableAuth" id="enableAuth-btn" class="btn btn-outline-primary me-2 mb-2" @click="enableAuth">{{ $t("Enable Auth") }}</button>
-                    <button v-if="! settings.disableAuth" id="disableAuth-btn" class="btn btn-primary me-2 mb-2" @click="confirmDisableAuth">{{ $t("Disable Auth") }}</button>
+                    <button
+                        v-if="settings.disableAuth"
+                        id="enableAuth-btn"
+                        class="btn btn-outline-primary me-2 mb-2"
+                        @click="enableAuth"
+                    >
+                        {{ $t("Enable Auth") }}
+                    </button>
+                    <button
+                        v-if="!settings.disableAuth"
+                        id="disableAuth-btn"
+                        class="btn btn-primary me-2 mb-2"
+                        @click="confirmDisableAuth"
+                    >
+                        {{ $t("Disable Auth") }}
+                    </button>
                 </div>
             </div>
         </div>
 
         <TwoFADialog ref="TwoFADialog" />
 
-        <Confirm ref="confirmDisableAuth" btn-style="btn-danger" :yes-text="$t('I understand, please disable')" :no-text="$t('Leave')" @yes="disableAuth">
+        <Confirm
+            ref="confirmDisableAuth"
+            btn-style="btn-danger"
+            :yes-text="$t('I understand, please disable')"
+            :no-text="$t('Leave')"
+            @yes="disableAuth"
+        >
             <i18n-t tag="p" keypath="disableauth.message1">
                 <template #disableAuth>
-                    <strong>{{ $t('disable authentication') }}</strong>
+                    <strong>{{ $t("disable authentication") }}</strong>
                 </template>
             </i18n-t>
             <i18n-t tag="p" keypath="disableauth.message2">
                 <template #intendThirdPartyAuth>
-                    <strong>{{ $t('intend to implement third-party authentication') }}</strong>
+                    <strong>{{
+                        $t("intend to implement third-party authentication")
+                    }}</strong>
                 </template>
             </i18n-t>
             <p>{{ $t("Please use this option carefully!") }}</p>
@@ -128,7 +160,7 @@ import TwoFADialog from "../../components/TwoFADialog.vue";
 export default {
     components: {
         Confirm,
-        TwoFADialog
+        TwoFADialog,
     },
 
     data() {
@@ -138,7 +170,7 @@ export default {
                 currentPassword: "",
                 newPassword: "",
                 repeatNewPassword: "",
-            }
+            },
         };
     },
 
@@ -151,7 +183,7 @@ export default {
         },
         settingsLoaded() {
             return this.$parent.$parent.$parent.settingsLoaded;
-        }
+        },
     },
 
     watch: {
@@ -222,7 +254,6 @@ export default {
         confirmDisableAuth() {
             this.$refs.confirmDisableAuth.show();
         },
-
     },
 };
 </script>

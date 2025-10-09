@@ -14,16 +14,35 @@ class PagerTree extends NotificationProvider {
         try {
             if (heartbeatJSON == null) {
                 // general messages
-                return this.postNotification(notification, msg, monitorJSON, heartbeatJSON);
+                return this.postNotification(
+                    notification,
+                    msg,
+                    monitorJSON,
+                    heartbeatJSON,
+                );
             }
 
-            if (heartbeatJSON.status === UP && notification.pagertreeAutoResolve === "resolve") {
-                return this.postNotification(notification, null, monitorJSON, heartbeatJSON, notification.pagertreeAutoResolve);
+            if (
+                heartbeatJSON.status === UP &&
+                notification.pagertreeAutoResolve === "resolve"
+            ) {
+                return this.postNotification(
+                    notification,
+                    null,
+                    monitorJSON,
+                    heartbeatJSON,
+                    notification.pagertreeAutoResolve,
+                );
             }
 
             if (heartbeatJSON.status === DOWN) {
                 const title = `Uptime Kuma Monitor "${monitorJSON.name}" is DOWN`;
-                return this.postNotification(notification, title, monitorJSON, heartbeatJSON);
+                return this.postNotification(
+                    notification,
+                    title,
+                    monitorJSON,
+                    heartbeatJSON,
+                );
             }
         } catch (error) {
             this.throwGeneralAxiosError(error);
@@ -38,10 +57,15 @@ class PagerTree extends NotificationProvider {
      */
     checkResult(result) {
         if (result.status == null) {
-            throw new Error("PagerTree notification failed with invalid response!");
+            throw new Error(
+                "PagerTree notification failed with invalid response!",
+            );
         }
         if (result.status < 200 || result.status >= 300) {
-            throw new Error("PagerTree notification failed with status code " + result.status);
+            throw new Error(
+                "PagerTree notification failed with status code " +
+                    result.status,
+            );
         }
     }
 
@@ -54,8 +78,13 @@ class PagerTree extends NotificationProvider {
      * @param {?string} eventAction Action event for PagerTree (create, resolve)
      * @returns {Promise<string>} Success state
      */
-    async postNotification(notification, title, monitorJSON, heartbeatJSON, eventAction = "create") {
-
+    async postNotification(
+        notification,
+        title,
+        monitorJSON,
+        heartbeatJSON,
+        eventAction = "create",
+    ) {
         if (eventAction == null) {
             return "No action required";
         }
@@ -70,14 +99,15 @@ class PagerTree extends NotificationProvider {
                 title: title,
                 urgency: notification.pagertreeUrgency,
                 heartbeat: heartbeatJSON,
-                monitor: monitorJSON
-            }
+                monitor: monitorJSON,
+            },
         };
 
         const baseURL = await setting("primaryBaseURL");
         if (baseURL && monitorJSON) {
             options.client = "Uptime Kuma";
-            options.client_url = baseURL + getMonitorRelativeURL(monitorJSON.id);
+            options.client_url =
+                baseURL + getMonitorRelativeURL(monitorJSON.id);
         }
 
         let result = await axios.request(options);

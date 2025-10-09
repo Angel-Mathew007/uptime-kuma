@@ -1,27 +1,44 @@
 <template>
     <form @submit.prevent="submit">
-        <div ref="keyaddmodal" class="modal fade" tabindex="-1" data-bs-backdrop="static">
+        <div
+            ref="keyaddmodal"
+            class="modal fade"
+            tabindex="-1"
+            data-bs-backdrop="static"
+        >
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">
                             {{ $t("Add API Key") }}
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        />
                     </div>
                     <div class="modal-body">
                         <!-- Name -->
                         <div class="mb-3">
-                            <label for="name" class="form-label">{{ $t("Name") }}</label>
+                            <label for="name" class="form-label">{{
+                                $t("Name")
+                            }}</label>
                             <input
-                                id="name" v-model="key.name" type="text" class="form-control"
+                                id="name"
+                                v-model="key.name"
+                                type="text"
+                                class="form-control"
                                 required
-                            >
+                            />
                         </div>
 
                         <!-- Expiry -->
                         <div class="my-3">
-                            <label class="form-label">{{ $t("Expiry date") }}</label>
+                            <label class="form-label">{{
+                                $t("Expiry date")
+                            }}</label>
                             <div class="d-flex flex-row align-items-center">
                                 <div class="col-6">
                                     <Datepicker
@@ -38,12 +55,16 @@
                                 <div class="col-6 ms-3">
                                     <div class="form-check mb-0">
                                         <input
-                                            id="no-expire" v-model="noExpire" class="form-check-input"
+                                            id="no-expire"
+                                            v-model="noExpire"
+                                            class="form-check-input"
                                             type="checkbox"
+                                        />
+                                        <label
+                                            class="form-check-label"
+                                            for="no-expire"
+                                            >{{ $t("Don't expire") }}</label
                                         >
-                                        <label class="form-check-label" for="no-expire">{{
-                                            $t("Don't expire")
-                                        }}</label>
                                     </div>
                                 </div>
                             </div>
@@ -51,7 +72,9 @@
                     </div>
                     <div class="modal-footer">
                         <button
-                            id="monitor-submit-btn" class="btn btn-primary" type="submit"
+                            id="monitor-submit-btn"
+                            class="btn btn-primary"
+                            type="submit"
                             :disabled="processing"
                         >
                             {{ $t("Generate") }}
@@ -60,14 +83,24 @@
                 </div>
             </div>
         </div>
-        <div ref="keymodal" class="modal fade" tabindex="-1" data-bs-backdrop="static">
+        <div
+            ref="keymodal"
+            class="modal fade"
+            tabindex="-1"
+            data-bs-backdrop="static"
+        >
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">
                             {{ $t("Key Added") }}
                         </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" />
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                        />
                     </div>
 
                     <div class="modal-body">
@@ -75,13 +108,20 @@
                             {{ $t("apiKeyAddedMsg") }}
                         </div>
                         <div class="mb-3">
-                            <CopyableInput v-model="clearKey" disabled="disabled" />
+                            <CopyableInput
+                                v-model="clearKey"
+                                disabled="disabled"
+                            />
                         </div>
                     </div>
 
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">
-                            {{ $t('Continue') }}
+                        <button
+                            type="button"
+                            class="btn btn-primary"
+                            data-bs-dismiss="modal"
+                        >
+                            {{ $t("Continue") }}
                         </button>
                     </div>
                 </div>
@@ -99,7 +139,7 @@ import CopyableInput from "./CopyableInput.vue";
 export default {
     components: {
         CopyableInput,
-        Datepicker
+        Datepicker,
     },
     props: {},
     // emits: [ "added" ],
@@ -109,7 +149,7 @@ export default {
             keymodal: null,
             processing: false,
             key: {},
-            dark: (this.$root.theme === "dark"),
+            dark: this.$root.theme === "dark",
             minDate: this.$root.date(dayjs()) + " 00:00",
             clearKey: null,
             noExpire: false,
@@ -173,7 +213,7 @@ export default {
             };
             this.noExpire = false;
         },
-    }
+    },
 };
 </script>
 
@@ -181,7 +221,8 @@ export default {
 @import "../assets/vars.scss";
 
 .dark {
-    .modal-dialog .form-text, .modal-dialog p {
+    .modal-dialog .form-text,
+    .modal-dialog p {
         color: $dark-font-color;
     }
 }

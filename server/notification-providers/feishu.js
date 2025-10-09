@@ -20,7 +20,11 @@ class Feishu extends NotificationProvider {
                         text: msg,
                     },
                 };
-                await axios.post(notification.feishuWebHookUrl, testdata, config);
+                await axios.post(
+                    notification.feishuWebHookUrl,
+                    testdata,
+                    config,
+                );
                 return okMsg;
             }
 
@@ -35,7 +39,9 @@ class Feishu extends NotificationProvider {
                         header: {
                             title: {
                                 tag: "plain_text",
-                                content: "UptimeKuma Alert: [Down] " + monitorJSON["name"],
+                                content:
+                                    "UptimeKuma Alert: [Down] " +
+                                    monitorJSON["name"],
                             },
                             template: "red",
                         },
@@ -46,11 +52,15 @@ class Feishu extends NotificationProvider {
                                     tag: "lark_md",
                                     content: getContent(heartbeatJSON),
                                 },
-                            }
-                        ]
-                    }
+                            },
+                        ],
+                    },
                 };
-                await axios.post(notification.feishuWebHookUrl, downdata, config);
+                await axios.post(
+                    notification.feishuWebHookUrl,
+                    downdata,
+                    config,
+                );
                 return okMsg;
             }
 
@@ -65,7 +75,9 @@ class Feishu extends NotificationProvider {
                         header: {
                             title: {
                                 tag: "plain_text",
-                                content: "UptimeKuma Alert: [UP] " + monitorJSON["name"],
+                                content:
+                                    "UptimeKuma Alert: [UP] " +
+                                    monitorJSON["name"],
                             },
                             template: "green",
                         },
@@ -77,8 +89,8 @@ class Feishu extends NotificationProvider {
                                     content: getContent(heartbeatJSON),
                                 },
                             },
-                        ]
-                    }
+                        ],
+                    },
                 };
                 await axios.post(notification.feishuWebHookUrl, updata, config);
                 return okMsg;
@@ -97,8 +109,11 @@ class Feishu extends NotificationProvider {
 function getContent(heartbeatJSON) {
     return [
         "**Message**: " + heartbeatJSON["msg"],
-        "**Ping**: " + (heartbeatJSON["ping"] == null ? "N/A" : heartbeatJSON["ping"] + " ms"),
-        `**Time (${heartbeatJSON["timezone"]})**: ${heartbeatJSON["localDateTime"]}`
+        "**Ping**: " +
+            (heartbeatJSON["ping"] == null
+                ? "N/A"
+                : heartbeatJSON["ping"] + " ms"),
+        `**Time (${heartbeatJSON["timezone"]})**: ${heartbeatJSON["localDateTime"]}`,
     ].join("\n");
 }
 

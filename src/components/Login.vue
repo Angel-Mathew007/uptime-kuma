@@ -5,36 +5,78 @@
                 <h1 class="h3 mb-3 fw-normal" />
 
                 <div v-if="!tokenRequired" class="form-floating">
-                    <input id="floatingInput" v-model="username" type="text" class="form-control" placeholder="Username" autocomplete="username" required>
+                    <input
+                        id="floatingInput"
+                        v-model="username"
+                        type="text"
+                        class="form-control"
+                        placeholder="Username"
+                        autocomplete="username"
+                        required
+                    />
                     <label for="floatingInput">{{ $t("Username") }}</label>
                 </div>
 
                 <div v-if="!tokenRequired" class="form-floating mt-3">
-                    <input id="floatingPassword" v-model="password" type="password" class="form-control" placeholder="Password" autocomplete="current-password" required>
+                    <input
+                        id="floatingPassword"
+                        v-model="password"
+                        type="password"
+                        class="form-control"
+                        placeholder="Password"
+                        autocomplete="current-password"
+                        required
+                    />
                     <label for="floatingPassword">{{ $t("Password") }}</label>
                 </div>
 
                 <div v-if="tokenRequired">
                     <div class="form-floating mt-3">
-                        <input id="otp" ref="otpInput" v-model="token" type="text" maxlength="6" class="form-control" placeholder="123456" autocomplete="one-time-code" required>
+                        <input
+                            id="otp"
+                            ref="otpInput"
+                            v-model="token"
+                            type="text"
+                            maxlength="6"
+                            class="form-control"
+                            placeholder="123456"
+                            autocomplete="one-time-code"
+                            required
+                        />
                         <label for="otp">{{ $t("Token") }}</label>
                     </div>
                 </div>
 
-                <div class="form-check mb-3 mt-3 d-flex justify-content-center pe-4">
+                <div
+                    class="form-check mb-3 mt-3 d-flex justify-content-center pe-4"
+                >
                     <div class="form-check">
-                        <input id="remember" v-model="$root.remember" type="checkbox" value="remember-me" class="form-check-input">
+                        <input
+                            id="remember"
+                            v-model="$root.remember"
+                            type="checkbox"
+                            value="remember-me"
+                            class="form-check-input"
+                        />
 
                         <label class="form-check-label" for="remember">
                             {{ $t("Remember me") }}
                         </label>
                     </div>
                 </div>
-                <button class="w-100 btn btn-primary" type="submit" :disabled="processing">
+                <button
+                    class="w-100 btn btn-primary"
+                    type="submit"
+                    :disabled="processing"
+                >
                     {{ $t("Login") }}
                 </button>
 
-                <div v-if="res && !res.ok" class="alert alert-danger mt-3" role="alert">
+                <div
+                    v-if="res && !res.ok"
+                    class="alert alert-danger mt-3"
+                    role="alert"
+                >
                     {{ $t(res.msg) }}
                 </div>
             </form>
@@ -62,7 +104,7 @@ export default {
                     this.$refs.otpInput?.focus();
                 });
             }
-        }
+        },
     },
 
     mounted() {
@@ -81,15 +123,20 @@ export default {
         submit() {
             this.processing = true;
 
-            this.$root.login(this.username, this.password, this.token, (res) => {
-                this.processing = false;
+            this.$root.login(
+                this.username,
+                this.password,
+                this.token,
+                (res) => {
+                    this.processing = false;
 
-                if (res.tokenRequired) {
-                    this.tokenRequired = true;
-                } else {
-                    this.res = res;
-                }
-            });
+                    if (res.tokenRequired) {
+                        this.tokenRequired = true;
+                    } else {
+                        this.res = res;
+                    }
+                },
+            );
         },
     },
 };

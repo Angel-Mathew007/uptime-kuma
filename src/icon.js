@@ -100,4 +100,3 @@ library.add(
 );
 
 export { FontAwesomeIcon };
-

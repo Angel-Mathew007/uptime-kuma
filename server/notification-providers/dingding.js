@@ -20,9 +20,9 @@ class DingDing extends NotificationProvider {
                         title: `[${this.statusToString(heartbeatJSON["status"])}] ${monitorJSON["name"]}`,
                         text: `## [${this.statusToString(heartbeatJSON["status"])}] ${monitorJSON["name"]} \n> ${heartbeatJSON["msg"]}\n> Time (${heartbeatJSON["timezone"]}): ${heartbeatJSON["localDateTime"]}`,
                     },
-                    "at": {
-                        "isAtAll": notification.mentioning === "everyone"
-                    }
+                    at: {
+                        isAtAll: notification.mentioning === "everyone",
+                    },
                 };
                 if (await this.sendToDingDing(notification, params)) {
                     return okMsg;
@@ -31,8 +31,8 @@ class DingDing extends NotificationProvider {
                 let params = {
                     msgtype: "text",
                     text: {
-                        content: msg
-                    }
+                        content: msg,
+                    },
                 };
                 if (await this.sendToDingDing(notification, params)) {
                     return okMsg;
@@ -76,8 +76,7 @@ class DingDing extends NotificationProvider {
      * @returns {string} Base64 encoded signature
      */
     sign(timestamp, secretKey) {
-        return Crypto
-            .createHmac("sha256", Buffer.from(secretKey, "utf8"))
+        return Crypto.createHmac("sha256", Buffer.from(secretKey, "utf8"))
             .update(Buffer.from(`${timestamp}\n${secretKey}`, "utf8"))
             .digest("base64");
     }

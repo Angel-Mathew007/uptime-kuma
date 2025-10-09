@@ -15,16 +15,16 @@ class Alerta extends NotificationProvider {
             let config = {
                 headers: {
                     "Content-Type": "application/json;charset=UTF-8",
-                    "Authorization": "Key " + notification.alertaApiKey,
-                }
+                    Authorization: "Key " + notification.alertaApiKey,
+                },
             };
             let data = {
                 environment: notification.alertaEnvironment,
                 severity: "critical",
                 correlate: [],
-                service: [ "UptimeKuma" ],
+                service: ["UptimeKuma"],
                 value: "Timeout",
-                tags: [ "uptimekuma" ],
+                tags: ["uptimekuma"],
                 attributes: {},
                 origin: "uptimekuma",
                 type: "exceptionAlert",
@@ -33,37 +33,55 @@ class Alerta extends NotificationProvider {
             config = this.getAxiosConfigWithProxy(config);
 
             if (heartbeatJSON == null) {
-                let postData = Object.assign({
-                    event: "msg",
-                    text: msg,
-                    group: "uptimekuma-msg",
-                    resource: "Message",
-                }, data);
+                let postData = Object.assign(
+                    {
+                        event: "msg",
+                        text: msg,
+                        group: "uptimekuma-msg",
+                        resource: "Message",
+                    },
+                    data,
+                );
 
-                await axios.post(notification.alertaApiEndpoint, postData, config);
+                await axios.post(
+                    notification.alertaApiEndpoint,
+                    postData,
+                    config,
+                );
             } else {
-                let datadup = Object.assign( {
-                    correlate: [ "service_up", "service_down" ],
-                    event: monitorJSON["type"],
-                    group: "uptimekuma-" + monitorJSON["type"],
-                    resource: monitorJSON["name"],
-                }, data );
+                let datadup = Object.assign(
+                    {
+                        correlate: ["service_up", "service_down"],
+                        event: monitorJSON["type"],
+                        group: "uptimekuma-" + monitorJSON["type"],
+                        resource: monitorJSON["name"],
+                    },
+                    data,
+                );
 
                 if (heartbeatJSON["status"] === DOWN) {
                     datadup.severity = notification.alertaAlertState; // critical
-                    datadup.text = "Service " + monitorJSON["type"] + " is down.";
-                    await axios.post(notification.alertaApiEndpoint, datadup, config);
+                    datadup.text =
+                        "Service " + monitorJSON["type"] + " is down.";
+                    await axios.post(
+                        notification.alertaApiEndpoint,
+                        datadup,
+                        config,
+                    );
                 } else if (heartbeatJSON["status"] === UP) {
                     datadup.severity = notification.alertaRecoverState; // cleaned
                     datadup.text = "Service " + monitorJSON["type"] + " is up.";
-                    await axios.post(notification.alertaApiEndpoint, datadup, config);
+                    await axios.post(
+                        notification.alertaApiEndpoint,
+                        datadup,
+                        config,
+                    );
                 }
             }
             return okMsg;
         } catch (error) {
             this.throwGeneralAxiosError(error);
         }
-
     }
 }
 

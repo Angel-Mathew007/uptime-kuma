@@ -12,9 +12,11 @@ class Signal extends NotificationProvider {
 
         try {
             let data = {
-                "message": msg,
-                "number": notification.signalNumber,
-                "recipients": notification.signalRecipients.replace(/\s/g, "").split(","),
+                message: msg,
+                number: notification.signalNumber,
+                recipients: notification.signalRecipients
+                    .replace(/\s/g, "")
+                    .split(","),
             };
             let config = {};
             config = this.getAxiosConfigWithProxy(config);

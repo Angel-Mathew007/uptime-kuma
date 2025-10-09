@@ -11,7 +11,11 @@
         />
         <div class="form-text">
             <i18n-t tag="p" keypath="Read more:">
-                <a href="https://docs.keephq.dev/providers/documentation/uptimekuma-provider" target="_blank">https://docs.keephq.dev/providers/documentation/uptimekuma-provider</a>
+                <a
+                    href="https://docs.keephq.dev/providers/documentation/uptimekuma-provider"
+                    target="_blank"
+                    >https://docs.keephq.dev/providers/documentation/uptimekuma-provider</a
+                >
             </i18n-t>
         </div>
     </div>

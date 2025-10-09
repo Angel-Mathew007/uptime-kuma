@@ -1,4 +1,9 @@
-const { checkLogin, setSetting, setting, doubleCheckPassword } = require("../util-server");
+const {
+    checkLogin,
+    setSetting,
+    setting,
+    doubleCheckPassword,
+} = require("../util-server");
 const { CloudflaredTunnel } = require("node-cloudflared-tunnel");
 const { UptimeKumaServer } = require("../uptime-kuma-server");
 const { log } = require("../../src/util");
@@ -33,22 +38,27 @@ cloudflared.error = (errorMessage) => {
  * @returns {void}
  */
 module.exports.cloudflaredSocketHandler = (socket) => {
-
     socket.on(prefix + "join", async () => {
         try {
             checkLogin(socket);
             socket.join("cloudflared");
-            io.to(socket.userID).emit(prefix + "installed", cloudflared.checkInstalled());
+            io.to(socket.userID).emit(
+                prefix + "installed",
+                cloudflared.checkInstalled(),
+            );
             io.to(socket.userID).emit(prefix + "running", cloudflared.running);
-            io.to(socket.userID).emit(prefix + "token", await setting("cloudflaredTunnelToken"));
-        } catch (error) { }
+            io.to(socket.userID).emit(
+                prefix + "token",
+                await setting("cloudflaredTunnelToken"),
+            );
+        } catch (error) {}
     });
 
     socket.on(prefix + "leave", async () => {
         try {
             checkLogin(socket);
             socket.leave("cloudflared");
-        } catch (error) { }
+        } catch (error) {}
     });
 
     socket.on(prefix + "start", async (token) => {
@@ -61,7 +71,7 @@ module.exports.cloudflaredSocketHandler = (socket) => {
                 cloudflared.token = null;
             }
             cloudflared.start();
-        } catch (error) { }
+        } catch (error) {}
     });
 
     socket.on(prefix + "stop", async (currentPassword, callback) => {
@@ -84,9 +94,8 @@ module.exports.cloudflaredSocketHandler = (socket) => {
         try {
             checkLogin(socket);
             await setSetting("cloudflaredTunnelToken", "");
-        } catch (error) { }
+        } catch (error) {}
     });
-
 };
 
 /**

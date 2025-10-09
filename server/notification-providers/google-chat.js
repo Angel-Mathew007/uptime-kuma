@@ -15,16 +15,23 @@ class GoogleChat extends NotificationProvider {
         try {
             let config = this.getAxiosConfigWithProxy({});
             // Google Chat message formatting: https://developers.google.com/chat/api/guides/message-formats/basic
-            if (notification.googleChatUseTemplate && notification.googleChatTemplate) {
+            if (
+                notification.googleChatUseTemplate &&
+                notification.googleChatTemplate
+            ) {
                 // Send message using template
                 const renderedText = await this.renderTemplate(
                     notification.googleChatTemplate,
                     msg,
                     monitorJSON,
-                    heartbeatJSON
+                    heartbeatJSON,
                 );
-                const data = { "text": renderedText };
-                await axios.post(notification.googleChatWebhookURL, data, config);
+                const data = { text: renderedText };
+                await axios.post(
+                    notification.googleChatWebhookURL,
+                    data,
+                    config,
+                );
                 return okMsg;
             }
 
@@ -60,7 +67,9 @@ class GoogleChat extends NotificationProvider {
             // add button for monitor link if available
             const baseURL = await setting("primaryBaseURL");
             if (baseURL) {
-                const urlPath = monitorJSON ? getMonitorRelativeURL(monitorJSON.id) : "/";
+                const urlPath = monitorJSON
+                    ? getMonitorRelativeURL(monitorJSON.id)
+                    : "/";
                 sectionWidgets.push({
                     buttonList: {
                         buttons: [

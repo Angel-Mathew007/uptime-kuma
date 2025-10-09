@@ -127,7 +127,10 @@
                         autocomplete="off"
                         value="no-line"
                     />
-                    <label class="btn btn-outline-primary" for="styleElapsedTimeShowNoLine">
+                    <label
+                        class="btn btn-outline-primary"
+                        for="styleElapsedTimeShowNoLine"
+                    >
                         {{ $t("styleElapsedTimeShowNoLine") }}
                     </label>
 
@@ -140,7 +143,10 @@
                         autocomplete="off"
                         value="with-line"
                     />
-                    <label class="btn btn-outline-primary" for="styleElapsedTimeShowWithLine">
+                    <label
+                        class="btn btn-outline-primary"
+                        for="styleElapsedTimeShowWithLine"
+                    >
                         {{ $t("styleElapsedTimeShowWithLine") }}
                     </label>
 
@@ -153,7 +159,10 @@
                         autocomplete="off"
                         value="none"
                     />
-                    <label class="btn btn-outline-primary" for="styleElapsedTimeNone">
+                    <label
+                        class="btn btn-outline-primary"
+                        for="styleElapsedTimeNone"
+                    >
                         {{ $t("None") }}
                     </label>
                 </div>
@@ -163,9 +172,7 @@
 </template>
 
 <script>
-export default {
-
-};
+export default {};
 </script>
 
 <style lang="scss" scoped>

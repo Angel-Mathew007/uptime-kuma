@@ -66,8 +66,8 @@ export function timezoneList() {
  */
 export function setPageLocale() {
     const html = document.documentElement;
-    html.setAttribute("lang", currentLocale() );
-    html.setAttribute("dir", localeDirection() );
+    html.setAttribute("lang", currentLocale());
+    html.setAttribute("dir", localeDirection());
 }
 
 /**
@@ -92,7 +92,7 @@ export function getResBaseURL() {
  */
 export function isDevContainer() {
     // eslint-disable-next-line no-undef
-    return (typeof DEVCONTAINER === "string" && DEVCONTAINER === "1");
+    return typeof DEVCONTAINER === "string" && DEVCONTAINER === "1";
 }
 
 /**
@@ -133,22 +133,14 @@ export function hostNameRegexPattern(mqtt = false) {
  */
 export function colorOptions(self) {
     return [
-        { name: self.$t("Gray"),
-            color: "#4B5563" },
-        { name: self.$t("Red"),
-            color: "#DC2626" },
-        { name: self.$t("Orange"),
-            color: "#D97706" },
-        { name: self.$t("Green"),
-            color: "#059669" },
-        { name: self.$t("Blue"),
-            color: "#2563EB" },
-        { name: self.$t("Indigo"),
-            color: "#4F46E5" },
-        { name: self.$t("Purple"),
-            color: "#7C3AED" },
-        { name: self.$t("Pink"),
-            color: "#DB2777" },
+        { name: self.$t("Gray"), color: "#4B5563" },
+        { name: self.$t("Red"), color: "#DC2626" },
+        { name: self.$t("Orange"), color: "#D97706" },
+        { name: self.$t("Green"), color: "#059669" },
+        { name: self.$t("Blue"), color: "#2563EB" },
+        { name: self.$t("Indigo"), color: "#4F46E5" },
+        { name: self.$t("Purple"), color: "#7C3AED" },
+        { name: self.$t("Pink"), color: "#DB2777" },
     ];
 }
 
@@ -220,7 +212,10 @@ class RelativeTimeFormatter {
      */
     constructor() {
         this.options = { numeric: "auto" };
-        this.instance = new Intl.RelativeTimeFormat(currentLocale(), this.options);
+        this.instance = new Intl.RelativeTimeFormat(
+            currentLocale(),
+            this.options,
+        );
     }
 
     /**
@@ -258,7 +253,7 @@ class RelativeTimeFormatter {
                 .filter(
                     (part, index) =>
                         (part.type === "literal" || part.type === "integer") &&
-                        index > 0
+                        index > 0,
                 )
                 .map((part) => part.value);
 
@@ -287,4 +282,3 @@ class RelativeTimeFormatter {
 }
 
 export const relativeTimeFormatter = new RelativeTimeFormatter();
-

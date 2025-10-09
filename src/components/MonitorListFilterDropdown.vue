@@ -1,6 +1,16 @@
 <template>
-    <div tabindex="-1" class="dropdown" @focusin="open = true" @focusout="handleFocusOut">
-        <button type="button" class="filter-dropdown-status" :class="{ 'active': filterActive }" tabindex="0">
+    <div
+        tabindex="-1"
+        class="dropdown"
+        @focusin="open = true"
+        @focusout="handleFocusOut"
+    >
+        <button
+            type="button"
+            class="filter-dropdown-status"
+            :class="{ active: filterActive }"
+            tabindex="0"
+        >
             <div class="px-1 d-flex align-items-center">
                 <slot name="status"></slot>
             </div>
@@ -8,7 +18,7 @@
                 <font-awesome-icon icon="angle-down" />
             </span>
         </button>
-        <ul class="filter-dropdown-menu" :class="{ 'open': open }">
+        <ul class="filter-dropdown-menu" :class="{ open: open }">
             <slot name="dropdown"></slot>
         </ul>
     </div>
@@ -21,11 +31,11 @@ export default {
         filterActive: {
             type: Boolean,
             required: true,
-        }
+        },
     },
     data() {
         return {
-            open: false
+            open: false,
         };
     },
     methods: {
@@ -34,8 +44,8 @@ export default {
                 return;
             }
             this.open = false;
-        }
-    }
+        },
+    },
 };
 </script>
 

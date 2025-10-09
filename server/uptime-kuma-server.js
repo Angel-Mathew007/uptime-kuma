@@ -52,9 +52,7 @@ class UptimeKumaServer {
     /**
      * @type {{}}
      */
-    static monitorTypeList = {
-
-    };
+    static monitorTypeList = {};
 
     /**
      * Use for decode the auth object
@@ -88,11 +86,14 @@ class UptimeKumaServer {
         this.app = express();
         if (isSSL) {
             log.info("server", "Server Type: HTTPS");
-            this.httpServer = https.createServer({
-                key: fs.readFileSync(sslKey),
-                cert: fs.readFileSync(sslCert),
-                passphrase: sslKeyPassphrase,
-            }, this.app);
+            this.httpServer = https.createServer(
+                {
+                    key: fs.readFileSync(sslKey),
+                    cert: fs.readFileSync(sslCert),
+                    passphrase: sslKeyPassphrase,
+                },
+                this.app,
+            );
         } else {
             log.info("server", "Server Type: HTTP");
             this.httpServer = http.createServer(this.app);
@@ -103,21 +104,27 @@ class UptimeKumaServer {
         } catch (e) {
             // "dist/index.html" is not necessary for development
             if (process.env.NODE_ENV !== "development") {
-                log.error("server", "Error: Cannot find 'dist/index.html', did you install correctly?");
+                log.error(
+                    "server",
+                    "Error: Cannot find 'dist/index.html', did you install correctly?",
+                );
                 process.exit(1);
             }
         }
 
         // Set Monitor Types
-        UptimeKumaServer.monitorTypeList["real-browser"] = new RealBrowserMonitorType();
-        UptimeKumaServer.monitorTypeList["tailscale-ping"] = new TailscalePing();
+        UptimeKumaServer.monitorTypeList["real-browser"] =
+            new RealBrowserMonitorType();
+        UptimeKumaServer.monitorTypeList["tailscale-ping"] =
+            new TailscalePing();
         UptimeKumaServer.monitorTypeList["dns"] = new DnsMonitorType();
         UptimeKumaServer.monitorTypeList["mqtt"] = new MqttMonitorType();
         UptimeKumaServer.monitorTypeList["smtp"] = new SMTPMonitorType();
         UptimeKumaServer.monitorTypeList["group"] = new GroupMonitorType();
         UptimeKumaServer.monitorTypeList["snmp"] = new SNMPMonitorType();
         UptimeKumaServer.monitorTypeList["mongodb"] = new MongodbMonitorType();
-        UptimeKumaServer.monitorTypeList["rabbitmq"] = new RabbitMqMonitorType();
+        UptimeKumaServer.monitorTypeList["rabbitmq"] =
+            new RabbitMqMonitorType();
         UptimeKumaServer.monitorTypeList["manual"] = new ManualMonitorType();
 
         // Allow all CORS origins (polling) in development
@@ -136,18 +143,28 @@ class UptimeKumaServer {
                 if (req._query) {
                     transport = req._query.transport;
                 } else {
-                    log.error("socket", "Ops!!! Cannot get transport type, assume that it is polling");
+                    log.error(
+                        "socket",
+                        "Ops!!! Cannot get transport type, assume that it is polling",
+                    );
                     transport = "polling";
                 }
 
-                const clientIP = await this.getClientIPwithProxy(req.connection.remoteAddress, req.headers);
-                log.info("socket", `New ${transport} connection, IP = ${clientIP}`);
+                const clientIP = await this.getClientIPwithProxy(
+                    req.connection.remoteAddress,
+                    req.headers,
+                );
+                log.info(
+                    "socket",
+                    `New ${transport} connection, IP = ${clientIP}`,
+                );
 
                 // The following check is only for websocket connections, polling connections are already protected by CORS
                 if (transport === "polling") {
                     callback(null, true);
                 } else if (transport === "websocket") {
-                    const bypass = process.env.UPTIME_KUMA_WS_ORIGIN_CHECK === "bypass";
+                    const bypass =
+                        process.env.UPTIME_KUMA_WS_ORIGIN_CHECK === "bypass";
                     if (bypass) {
                         log.info("auth", "WebSocket origin check is bypassed");
                         callback(null, true);
@@ -165,20 +182,29 @@ class UptimeKumaServer {
                                 xForwardedFor = req.headers["x-forwarded-for"];
                             }
 
-                            if (host !== originURL.host && xForwardedFor !== originURL.host) {
+                            if (
+                                host !== originURL.host &&
+                                xForwardedFor !== originURL.host
+                            ) {
                                 callback(null, false);
-                                log.error("auth", `Origin (${origin}) does not match host (${host}), IP: ${clientIP}`);
+                                log.error(
+                                    "auth",
+                                    `Origin (${origin}) does not match host (${host}), IP: ${clientIP}`,
+                                );
                             } else {
                                 callback(null, true);
                             }
                         } catch (e) {
                             // Invalid origin url, probably not from browser
                             callback(null, false);
-                            log.error("auth", `Invalid origin url (${origin}), IP: ${clientIP}`);
+                            log.error(
+                                "auth",
+                                `Invalid origin url (${origin}), IP: ${clientIP}`,
+                            );
                         }
                     }
                 }
-            }
+            },
         });
     }
 
@@ -239,18 +265,21 @@ class UptimeKumaServer {
      * Generated by Trelent
      */
     async getMonitorJSONList(userID, monitorID = null) {
-
         let query = " user_id = ? ";
-        let queryParams = [ userID ];
+        let queryParams = [userID];
 
         if (monitorID) {
             query += "AND id = ? ";
             queryParams.push(monitorID);
         }
 
-        let monitorList = await R.find("monitor", query + "ORDER BY weight DESC, name", queryParams);
+        let monitorList = await R.find(
+            "monitor",
+            query + "ORDER BY weight DESC, name",
+            queryParams,
+        );
 
-        const monitorData = monitorList.map(monitor => ({
+        const monitorData = monitorList.map((monitor) => ({
             id: monitor.id,
             active: monitor.active,
             name: monitor.name,
@@ -258,7 +287,9 @@ class UptimeKumaServer {
         const preloadData = await Monitor.preparePreloadData(monitorData);
 
         const result = {};
-        monitorList.forEach(monitor => result[monitor.id] = monitor.toJSON(preloadData));
+        monitorList.forEach(
+            (monitor) => (result[monitor.id] = monitor.toJSON(preloadData)),
+        );
         return result;
     }
 
@@ -290,7 +321,8 @@ class UptimeKumaServer {
     async getMaintenanceJSONList(userID) {
         let result = {};
         for (let maintenanceID in this.maintenanceList) {
-            result[maintenanceID] = await this.maintenanceList[maintenanceID].toJSON();
+            result[maintenanceID] =
+                await this.maintenanceList[maintenanceID].toJSON();
         }
         return result;
     }
@@ -301,9 +333,11 @@ class UptimeKumaServer {
      * @returns {Promise<void>}
      */
     async loadMaintenanceList(userID) {
-        let maintenanceList = await R.findAll("maintenance", " ORDER BY end_date DESC, title", [
-
-        ]);
+        let maintenanceList = await R.findAll(
+            "maintenance",
+            " ORDER BY end_date DESC, title",
+            [],
+        );
 
         for (let maintenance of maintenanceList) {
             this.maintenanceList[maintenance.id] = maintenance;
@@ -330,9 +364,12 @@ class UptimeKumaServer {
      * @returns {void}
      */
     static errorLog(error, outputToConsole = true) {
-        const errorLogStream = fs.createWriteStream(path.join(Database.dataDir, "/error.log"), {
-            flags: "a"
-        });
+        const errorLogStream = fs.createWriteStream(
+            path.join(Database.dataDir, "/error.log"),
+            {
+                flags: "a",
+            },
+        );
 
         errorLogStream.on("error", () => {
             log.info("", "Cannot write to error.log");
@@ -356,7 +393,10 @@ class UptimeKumaServer {
      * @returns {Promise<string>} IP of client
      */
     getClientIP(socket) {
-        return this.getClientIPwithProxy(socket.client.conn.remoteAddress, socket.client.conn.request.headers);
+        return this.getClientIPwithProxy(
+            socket.client.conn.remoteAddress,
+            socket.client.conn.request.headers,
+        );
     }
 
     /**
@@ -372,9 +412,13 @@ class UptimeKumaServer {
         if (await Settings.get("trustProxy")) {
             const forwardedFor = headers["x-forwarded-for"];
 
-            return (typeof forwardedFor === "string" ? forwardedFor.split(",")[0].trim() : null)
-                || headers["x-real-ip"]
-                || clientIP.replace(/^::ffff:/, "");
+            return (
+                (typeof forwardedFor === "string"
+                    ? forwardedFor.split(",")[0].trim()
+                    : null) ||
+                headers["x-real-ip"] ||
+                clientIP.replace(/^::ffff:/, "")
+            );
         } else {
             return clientIP.replace(/^::ffff:/, "");
         }
@@ -422,7 +466,10 @@ class UptimeKumaServer {
             }
         } catch (e) {
             // Guess failed, fall back to UTC
-            log.debug("timezone", "Guessed an invalid timezone. Use UTC as fallback");
+            log.debug(
+                "timezone",
+                "Guessed an invalid timezone. Use UTC as fallback",
+            );
             return "UTC";
         }
     }
@@ -537,20 +584,20 @@ class UptimeKumaServer {
                 try {
                     socket.emit("refresh");
                     socket.disconnect();
-                } catch (e) {
-
-                }
+                } catch (e) {}
             }
         }
     }
 }
 
 module.exports = {
-    UptimeKumaServer
+    UptimeKumaServer,
 };
 
 // Must be at the end to avoid circular dependencies
-const { RealBrowserMonitorType } = require("./monitor-types/real-browser-monitor-type");
+const {
+    RealBrowserMonitorType,
+} = require("./monitor-types/real-browser-monitor-type");
 const { TailscalePing } = require("./monitor-types/tailscale-ping");
 const { DnsMonitorType } = require("./monitor-types/dns");
 const { MqttMonitorType } = require("./monitor-types/mqtt");

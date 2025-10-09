@@ -2,7 +2,6 @@ import { expect, test } from "@playwright/test";
 import { login, restoreSqliteSnapshot, screenshot } from "../util-test";
 
 test.describe("Status Page", () => {
-
     test.beforeEach(async ({ page }) => {
         await restoreSqliteSnapshot(page);
     });
@@ -43,7 +42,10 @@ test.describe("Status Page", () => {
         await page.getByTestId("tag-name-input").fill(tagName);
         await page.getByTestId("tag-value-input").fill(tagValue);
         await page.getByTestId("tag-color-select").click(); // Vue-Multiselect component
-        await page.getByTestId("tag-color-select").getByRole("option", { name: "Orange" }).click();
+        await page
+            .getByTestId("tag-color-select")
+            .getByRole("option", { name: "Orange" })
+            .click();
 
         // Add another tag instead of submitting directly
         await page.getByRole("button", { name: "Add Another Tag" }).click();
@@ -52,7 +54,10 @@ test.describe("Status Page", () => {
         await page.getByTestId("tag-name-input").fill(tagName2);
         await page.getByTestId("tag-value-input").fill(tagValue2);
         await page.getByTestId("tag-color-select").click();
-        await page.getByTestId("tag-color-select").getByRole("option", { name: "Blue" }).click();
+        await page
+            .getByTestId("tag-color-select")
+            .getByRole("option", { name: "Blue" })
+            .click();
 
         // Submit both tags
         await page.getByTestId("add-tags-final-button").click();
@@ -72,19 +77,28 @@ test.describe("Status Page", () => {
         // Fill in some details
         await page.getByTestId("description-input").fill(descriptionText);
         await page.getByTestId("footer-text-input").fill(footerText);
-        await page.getByTestId("refresh-interval-input").fill(String(refreshInterval));
+        await page
+            .getByTestId("refresh-interval-input")
+            .fill(String(refreshInterval));
         await page.getByTestId("theme-select").selectOption(theme);
         await page.getByTestId("show-tags-checkbox").uncheck();
         await page.getByTestId("show-powered-by-checkbox").uncheck();
         await page.getByTestId("show-certificate-expiry-checkbox").uncheck();
-        await page.getByTestId("google-analytics-input").fill(googleAnalyticsId);
-        await page.getByTestId("custom-css-input").getByTestId("textarea").fill(customCss); // Prism
+        await page
+            .getByTestId("google-analytics-input")
+            .fill(googleAnalyticsId);
+        await page
+            .getByTestId("custom-css-input")
+            .getByTestId("textarea")
+            .fill(customCss); // Prism
 
         // Add an incident
         await page.getByTestId("create-incident-button").click();
         await page.getByTestId("incident-title").isEditable();
         await page.getByTestId("incident-title").fill(incidentTitle);
-        await page.getByTestId("incident-content-editable").fill(incidentContent);
+        await page
+            .getByTestId("incident-content-editable")
+            .fill(incidentContent);
         await page.getByTestId("post-incident-button").click();
 
         // Add a group
@@ -94,10 +108,17 @@ test.describe("Status Page", () => {
 
         // Add the monitor
         await page.getByTestId("monitor-select").click(); // Vue-Multiselect component
-        await page.getByTestId("monitor-select").getByRole("option", { name: monitorName }).click();
+        await page
+            .getByTestId("monitor-select")
+            .getByRole("option", { name: monitorName })
+            .click();
         await expect(page.getByTestId("monitor")).toHaveCount(1);
-        await expect(page.getByTestId("monitor-name")).toContainText(monitorName);
-        await expect(page.getByTestId("monitor-name")).not.toHaveAttribute("href");
+        await expect(page.getByTestId("monitor-name")).toContainText(
+            monitorName,
+        );
+        await expect(page.getByTestId("monitor-name")).not.toHaveAttribute(
+            "href",
+        );
 
         // Set public url on
         await page.getByTestId("monitor-settings").click();
@@ -112,27 +133,49 @@ test.describe("Status Page", () => {
 
         // Ensure changes are visible
         await expect(page.getByTestId("incident")).toHaveCount(1);
-        await expect(page.getByTestId("incident-title")).toContainText(incidentTitle);
-        await expect(page.getByTestId("incident-content")).toContainText(incidentContent);
+        await expect(page.getByTestId("incident-title")).toContainText(
+            incidentTitle,
+        );
+        await expect(page.getByTestId("incident-content")).toContainText(
+            incidentContent,
+        );
         await expect(page.getByTestId("group-name")).toContainText(groupName);
         await expect(page.getByTestId("powered-by")).toHaveCount(0);
 
-        await expect(page.getByTestId("monitor-name")).toHaveAttribute("href", monitorCustomUrl);
+        await expect(page.getByTestId("monitor-name")).toHaveAttribute(
+            "href",
+            monitorCustomUrl,
+        );
 
-        await expect(page.getByTestId("update-countdown-text")).toContainText("00:");
-        const updateCountdown = Number((await page.getByTestId("update-countdown-text").textContent()).match(/(\d+):(\d+)/)[2]);
+        await expect(page.getByTestId("update-countdown-text")).toContainText(
+            "00:",
+        );
+        const updateCountdown = Number(
+            (
+                await page.getByTestId("update-countdown-text").textContent()
+            ).match(/(\d+):(\d+)/)[2],
+        );
         expect(updateCountdown).toBeGreaterThanOrEqual(refreshInterval - 10); // cant be certain when the timer will start, so ensure it's within expected range
         expect(updateCountdown).toBeLessThanOrEqual(refreshInterval);
 
         await expect(page.locator("body")).toHaveClass(theme);
 
         // Add Google Analytics ID to head and verify
-        await page.waitForFunction(() => {
-            return document.head.innerHTML.includes("https://www.googletagmanager.com/gtag/js?id=");
-        }, { timeout: 5000 });
-        expect(await page.locator("head").innerHTML()).toContain(googleAnalyticsId);
+        await page.waitForFunction(
+            () => {
+                return document.head.innerHTML.includes(
+                    "https://www.googletagmanager.com/gtag/js?id=",
+                );
+            },
+            { timeout: 5000 },
+        );
+        expect(await page.locator("head").innerHTML()).toContain(
+            googleAnalyticsId,
+        );
 
-        const backgroundColor = await page.evaluate(() => window.getComputedStyle(document.body).backgroundColor);
+        const backgroundColor = await page.evaluate(
+            () => window.getComputedStyle(document.body).backgroundColor,
+        );
         expect(backgroundColor).toEqual("rgb(0, 128, 128)");
 
         await screenshot(testInfo, page);
@@ -147,16 +190,21 @@ test.describe("Status Page", () => {
         await page.getByTestId("save-button").click();
 
         await expect(page.getByTestId("edit-sidebar")).toHaveCount(0);
-        await expect(page.getByTestId("powered-by")).toContainText("Powered by");
+        await expect(page.getByTestId("powered-by")).toContainText(
+            "Powered by",
+        );
 
         // Modified tag verification to check both tags
-        await expect(page.getByTestId("monitor-tag").filter({ hasText: tagValue })).toBeVisible();
-        await expect(page.getByTestId("monitor-tag").filter({ hasText: tagValue2 })).toBeVisible();
+        await expect(
+            page.getByTestId("monitor-tag").filter({ hasText: tagValue }),
+        ).toBeVisible();
+        await expect(
+            page.getByTestId("monitor-tag").filter({ hasText: tagValue2 }),
+        ).toBeVisible();
 
         await screenshot(testInfo, page);
     });
 
     // @todo Test certificate expiry
     // @todo Test domain names
-
 });

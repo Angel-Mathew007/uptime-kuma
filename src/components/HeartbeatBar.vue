@@ -5,7 +5,7 @@
                 v-for="(beat, index) in shortBeatList"
                 :key="index"
                 class="beat-hover-area"
-                :class="{ 'empty': (beat === 0) }"
+                :class="{ empty: beat === 0 }"
                 :style="beatHoverAreaStyle"
                 :aria-label="getBeatAriaLabel(beat)"
                 role="status"
@@ -23,11 +23,20 @@
             </div>
         </div>
         <div
-            v-if="!$root.isMobile && size !== 'small' && beatList.length > 4 && $root.styleElapsedTime !== 'none'"
-            class="d-flex justify-content-between align-items-center word" :style="timeStyle"
+            v-if="
+                !$root.isMobile &&
+                size !== 'small' &&
+                beatList.length > 4 &&
+                $root.styleElapsedTime !== 'none'
+            "
+            class="d-flex justify-content-between align-items-center word"
+            :style="timeStyle"
         >
             <div>{{ timeSinceFirstBeat }}</div>
-            <div v-if="$root.styleElapsedTime === 'with-line'" class="connecting-line"></div>
+            <div
+                v-if="$root.styleElapsedTime === 'with-line'"
+                class="connecting-line"
+            ></div>
             <div>{{ timeSinceLastBeat }}</div>
         </div>
 
@@ -70,8 +79,8 @@ export default {
         /** Heartbeat bar days */
         heartbeatBarDays: {
             type: Number,
-            default: 0
-        }
+            default: 0,
+        },
     },
     data() {
         return {
@@ -91,13 +100,15 @@ export default {
         };
     },
     computed: {
-
         /**
          * Normalized heartbeatBarDays as a number
          * @returns {number} Number of days for heartbeat bar
          */
         normalizedHeartbeatBarDays() {
-            return Math.max(0, Math.min(365, Math.floor(this.heartbeatBarDays || 0)));
+            return Math.max(
+                0,
+                Math.min(365, Math.floor(this.heartbeatBarDays || 0)),
+            );
         },
 
         /**
@@ -145,7 +156,10 @@ export default {
             }
 
             // If heartbeat days is configured (not auto), data is already aggregated from server
-            if (this.normalizedHeartbeatBarDays > 0 && this.beatList.length > 0) {
+            if (
+                this.normalizedHeartbeatBarDays > 0 &&
+                this.beatList.length > 0
+            ) {
                 // Show all beats from server - they are already properly aggregated
                 return this.beatList;
             }
@@ -176,8 +190,10 @@ export default {
         },
 
         wrapStyle() {
-            let topBottom = (((this.beatHeight * this.hoverScale) - this.beatHeight) / 2);
-            let leftRight = (((this.beatWidth * this.hoverScale) - this.beatWidth) / 2);
+            let topBottom =
+                (this.beatHeight * this.hoverScale - this.beatHeight) / 2;
+            let leftRight =
+                (this.beatWidth * this.hoverScale - this.beatWidth) / 2;
 
             return {
                 padding: `${topBottom}px ${leftRight}px`,
@@ -193,12 +209,10 @@ export default {
                     transition: "all ease-in-out 0.25s",
                     transform: `translateX(${width}px)`,
                 };
-
             }
             return {
                 transform: "translateX(0)",
             };
-
         },
 
         beatHoverAreaStyle() {
@@ -221,7 +235,10 @@ export default {
          */
         timeStyle() {
             return {
-                "margin-left": this.numPadding * (this.beatWidth + this.beatHoverAreaPadding * 2) + "px",
+                "margin-left":
+                    this.numPadding *
+                        (this.beatWidth + this.beatHoverAreaPadding * 2) +
+                    "px",
             };
         },
 
@@ -231,7 +248,7 @@ export default {
          */
         timeSinceFirstBeat() {
             if (this.normalizedHeartbeatBarDays === 1) {
-                return (this.normalizedHeartbeatBarDays * 24) + "h";
+                return this.normalizedHeartbeatBarDays * 24 + "h";
             }
             if (this.normalizedHeartbeatBarDays >= 2) {
                 return this.normalizedHeartbeatBarDays + "d";
@@ -239,8 +256,13 @@ export default {
 
             // Need to calculate from actual data
             const firstValidBeat = this.shortBeatList.at(this.numPadding);
-            const minutes = dayjs().diff(dayjs.utc(firstValidBeat?.time), "minutes");
-            return minutes > 60 ? Math.floor(minutes / 60) + "h" : minutes + "m";
+            const minutes = dayjs().diff(
+                dayjs.utc(firstValidBeat?.time),
+                "minutes",
+            );
+            return minutes > 60
+                ? Math.floor(minutes / 60) + "h"
+                : minutes + "m";
         },
 
         /**
@@ -249,7 +271,10 @@ export default {
          */
         timeSinceLastBeat() {
             const lastValidBeat = this.shortBeatList.at(-1);
-            const seconds = dayjs().diff(dayjs.utc(lastValidBeat?.time), "seconds");
+            const seconds = dayjs().diff(
+                dayjs.utc(lastValidBeat?.time),
+                "seconds",
+            );
 
             let tolerance = 60 * 2; // default for when monitorList not available
             if (this.$root.monitorList[this.monitorId] != null) {
@@ -259,11 +284,13 @@ export default {
             if (seconds < tolerance) {
                 return this.$t("now");
             } else if (seconds < 60 * 60) {
-                return this.$t("time ago", [ (seconds / 60).toFixed(0) + "m" ] );
+                return this.$t("time ago", [(seconds / 60).toFixed(0) + "m"]);
             } else {
-                return this.$t("time ago", [ (seconds / 60 / 60).toFixed(0) + "h" ] );
+                return this.$t("time ago", [
+                    (seconds / 60 / 60).toFixed(0) + "h",
+                ]);
             }
-        }
+        },
     },
     watch: {
         beatList: {
@@ -302,14 +329,16 @@ export default {
         // Suddenly, have an idea how to handle it universally.
         // If the pixel * ratio != Integer, then it causes render issue, round it to solve it!!
         const actualWidth = this.beatWidth * window.devicePixelRatio;
-        const actualHoverAreaPadding = this.beatHoverAreaPadding * window.devicePixelRatio;
+        const actualHoverAreaPadding =
+            this.beatHoverAreaPadding * window.devicePixelRatio;
 
         if (!Number.isInteger(actualWidth)) {
             this.beatWidth = Math.round(actualWidth) / window.devicePixelRatio;
         }
 
         if (!Number.isInteger(actualHoverAreaPadding)) {
-            this.beatHoverAreaPadding = Math.round(actualHoverAreaPadding) / window.devicePixelRatio;
+            this.beatHoverAreaPadding =
+                Math.round(actualHoverAreaPadding) / window.devicePixelRatio;
         }
 
         window.addEventListener("resize", this.resize);
@@ -322,10 +351,16 @@ export default {
          */
         resize() {
             if (this.$refs.wrap) {
-                const newMaxBeat = Math.floor(this.$refs.wrap.clientWidth / (this.beatWidth + this.beatHoverAreaPadding * 2));
+                const newMaxBeat = Math.floor(
+                    this.$refs.wrap.clientWidth /
+                        (this.beatWidth + this.beatHoverAreaPadding * 2),
+                );
 
                 // If maxBeat changed and we're in configured days mode, notify parent to reload data
-                if (newMaxBeat !== this.maxBeat && this.normalizedHeartbeatBarDays > 0) {
+                if (
+                    newMaxBeat !== this.maxBeat &&
+                    this.normalizedHeartbeatBarDays > 0
+                ) {
                     this.maxBeat = newMaxBeat;
 
                     // Find the closest parent with reloadHeartbeatData method (StatusPage)
@@ -372,7 +407,7 @@ export default {
             return {
                 down: status === DOWN,
                 pending: status === PENDING,
-                maintenance: status === MAINTENANCE
+                maintenance: status === MAINTENANCE,
             };
         },
 
@@ -421,7 +456,7 @@ export default {
                 const rect = event.target.getBoundingClientRect();
 
                 // Position relative to viewport
-                const x = rect.left + (rect.width / 2);
+                const x = rect.left + rect.width / 2;
                 const y = rect.top;
 
                 // Check if tooltip would go off-screen and adjust position
@@ -444,9 +479,9 @@ export default {
                 const tooltipWidth = 120; // Approximate tooltip width
                 let adjustedX = x;
 
-                if ((x - tooltipWidth / 2) < 10) {
+                if (x - tooltipWidth / 2 < 10) {
                     adjustedX = tooltipWidth / 2 + 10;
-                } else if ((x + tooltipWidth / 2) > (window.innerWidth - 10)) {
+                } else if (x + tooltipWidth / 2 > window.innerWidth - 10) {
                     adjustedX = window.innerWidth - tooltipWidth / 2 - 10;
                 }
 
@@ -468,7 +503,6 @@ export default {
             this.tooltipVisible = false;
             this.tooltipContent = null;
         },
-
     },
 };
 </script>

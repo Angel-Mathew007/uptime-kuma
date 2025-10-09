@@ -12,7 +12,9 @@ async function selectMonitorType(page, monitorType = "dns") {
     await expect(monitorTypeSelect).toBeVisible();
     await monitorTypeSelect.selectOption(monitorType);
 
-    const selectedValue = await monitorTypeSelect.evaluate((select) => select.value);
+    const selectedValue = await monitorTypeSelect.evaluate(
+        (select) => select.value,
+    );
     expect(selectedValue).toBe(monitorType);
 }
 
@@ -65,15 +67,23 @@ test.describe("Monitor Form", () => {
         await page.getByTestId("add-condition-button").click();
         expect(await page.getByTestId("condition").count()).toEqual(2); // 2 explicitly added
 
-        await page.getByTestId("condition-value").nth(0).fill("a.iana-servers.net");
+        await page
+            .getByTestId("condition-value")
+            .nth(0)
+            .fill("a.iana-servers.net");
         await page.getByTestId("condition-and-or").nth(0).selectOption("or");
-        await page.getByTestId("condition-value").nth(1).fill("b.iana-servers.net");
+        await page
+            .getByTestId("condition-value")
+            .nth(1)
+            .fill("b.iana-servers.net");
 
         await screenshot(testInfo, page);
         await page.getByTestId("save-button").click();
         await page.waitForURL("/dashboard/*");
 
-        expect(page.getByTestId("monitor-status")).toHaveText("up", { ignoreCase: true });
+        expect(page.getByTestId("monitor-status")).toHaveText("up", {
+            ignoreCase: true,
+        });
 
         await screenshot(testInfo, page);
     });
@@ -95,13 +105,18 @@ test.describe("Monitor Form", () => {
         await page.getByTestId("add-condition-button").click();
         expect(await page.getByTestId("condition").count()).toEqual(1); // 1 explicitly added
 
-        await page.getByTestId("condition-value").nth(0).fill("definitely-not.net");
+        await page
+            .getByTestId("condition-value")
+            .nth(0)
+            .fill("definitely-not.net");
 
         await screenshot(testInfo, page);
         await page.getByTestId("save-button").click();
         await page.waitForURL("/dashboard/*");
 
-        expect(page.getByTestId("monitor-status")).toHaveText("down", { ignoreCase: true });
+        expect(page.getByTestId("monitor-status")).toHaveText("down", {
+            ignoreCase: true,
+        });
 
         await screenshot(testInfo, page);
     });

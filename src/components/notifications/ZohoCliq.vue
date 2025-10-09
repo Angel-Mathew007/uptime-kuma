@@ -1,6 +1,8 @@
 <template>
     <div class="mb-3">
-        <label for="zcliq-webhookurl" class="form-label">{{ $t("Webhook URL") }}</label>
+        <label for="zcliq-webhookurl" class="form-label">{{
+            $t("Webhook URL")
+        }}</label>
         <input
             id="zcliq-webhookurl"
             v-model="$parent.notification.webhookUrl"
@@ -12,7 +14,8 @@
             <a
                 href="https://www.zoho.com/cliq/help/platform/webhook-tokens.html"
                 target="_blank"
-            >{{ $t("here") }}</a>
+                >{{ $t("here") }}</a
+            >
         </i18n-t>
     </div>
 </template>

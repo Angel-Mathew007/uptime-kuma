@@ -10,7 +10,10 @@ class TailscalePing extends MonitorType {
      */
     async check(monitor, heartbeat, _server) {
         try {
-            let tailscaleOutput = await this.runTailscalePing(monitor.hostname, monitor.interval);
+            let tailscaleOutput = await this.runTailscalePing(
+                monitor.hostname,
+                monitor.interval,
+            );
             this.parseTailscaleOutput(tailscaleOutput, heartbeat);
         } catch (err) {
             // trigger log function somewhere to display a notification or alert to the user (but how?)
@@ -27,10 +30,14 @@ class TailscalePing extends MonitorType {
      */
     async runTailscalePing(hostname, interval) {
         let timeout = interval * 1000 * 0.8;
-        let res = await childProcessAsync.spawn("tailscale", [ "ping", "--c", "1", hostname ], {
-            timeout: timeout,
-            encoding: "utf8",
-        });
+        let res = await childProcessAsync.spawn(
+            "tailscale",
+            ["ping", "--c", "1", hostname],
+            {
+                timeout: timeout,
+                encoding: "utf8",
+            },
+        );
         if (res.stderr && res.stderr.toString()) {
             throw new Error(`Error in output: ${res.stderr.toString()}`);
         }
@@ -62,9 +69,13 @@ class TailscalePing extends MonitorType {
                 throw new Error(`Ping timed out: "${line}"`);
                 // Immediately throws upon "timed out" message, the server is expected to re-call the check function
             } else if (line.includes("no matching peer")) {
-                throw new Error(`Nonexistant or inaccessible due to ACLs: "${line}"`);
+                throw new Error(
+                    `Nonexistant or inaccessible due to ACLs: "${line}"`,
+                );
             } else if (line.includes("is local Tailscale IP")) {
-                throw new Error(`Tailscale only works if used on other machines: "${line}"`);
+                throw new Error(
+                    `Tailscale only works if used on other machines: "${line}"`,
+                );
             } else if (line !== "") {
                 throw new Error(`Unexpected output: "${line}"`);
             }

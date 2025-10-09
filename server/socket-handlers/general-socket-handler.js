@@ -17,10 +17,10 @@ let gameList = null;
 function getGameList() {
     if (gameList == null) {
         gameList = gameResolver._readGames().games.sort((a, b) => {
-            if ( a.pretty < b.pretty ) {
+            if (a.pretty < b.pretty) {
                 return -1;
             }
-            if ( a.pretty > b.pretty ) {
+            if (a.pretty > b.pretty) {
                 return 1;
             }
             return 0;
@@ -67,21 +67,23 @@ module.exports.generalSocketHandler = (socket, server) => {
         try {
             checkLogin(socket);
             // Just noticed that await call could block the whole socket.io server!!! Use pure promise instead.
-            testChrome(executable).then((version) => {
-                callback({
-                    ok: true,
-                    msg: {
-                        key: "foundChromiumVersion",
-                        values: [ version ],
-                    },
-                    msgi18n: true,
+            testChrome(executable)
+                .then((version) => {
+                    callback({
+                        ok: true,
+                        msg: {
+                            key: "foundChromiumVersion",
+                            values: [version],
+                        },
+                        msgi18n: true,
+                    });
+                })
+                .catch((e) => {
+                    callback({
+                        ok: false,
+                        msg: e.message,
+                    });
                 });
-            }).catch((e) => {
-                callback({
-                    ok: false,
-                    msg: e.message,
-                });
-            });
         } catch (e) {
             callback({
                 ok: false,
@@ -112,14 +114,15 @@ module.exports.generalSocketHandler = (socket, server) => {
                 if (file.startsWith("index.")) {
                     callback({
                         ok: true,
-                        code: await fsAsync.readFile(path.join(dir, file), "utf8"),
+                        code: await fsAsync.readFile(
+                            path.join(dir, file),
+                            "utf8",
+                        ),
                     });
                     return;
                 }
             }
-        } catch (e) {
-
-        }
+        } catch (e) {}
 
         callback({
             ok: false,

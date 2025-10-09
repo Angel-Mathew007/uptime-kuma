@@ -2,9 +2,13 @@ const tcpp = require("tcp-ping");
 const ping = require("@louislam/ping");
 const { R } = require("redbean-node");
 const {
-    log, genSecret, badgeConstants,
-    PING_PACKET_SIZE_DEFAULT, PING_GLOBAL_TIMEOUT_DEFAULT,
-    PING_COUNT_DEFAULT, PING_PER_REQUEST_TIMEOUT_DEFAULT
+    log,
+    genSecret,
+    badgeConstants,
+    PING_PACKET_SIZE_DEFAULT,
+    PING_GLOBAL_TIMEOUT_DEFAULT,
+    PING_COUNT_DEFAULT,
+    PING_PER_REQUEST_TIMEOUT_DEFAULT,
 } = require("../src/util");
 const passwordHash = require("./password-hash");
 const { Resolver } = require("dns");
@@ -76,12 +80,19 @@ exports.decodeJwt = (jwt) => {
  * @param {string} authMethod The method used to send the credentials. Default client_secret_basic
  * @returns {Promise<oidc.TokenSet>} TokenSet promise if the token request was successful
  */
-exports.getOidcTokenClientCredentials = async (tokenEndpoint, clientId, clientSecret, scope, audience, authMethod = "client_secret_basic") => {
+exports.getOidcTokenClientCredentials = async (
+    tokenEndpoint,
+    clientId,
+    clientSecret,
+    scope,
+    audience,
+    authMethod = "client_secret_basic",
+) => {
     const oauthProvider = new oidc.Issuer({ token_endpoint: tokenEndpoint });
     let client = new oauthProvider.Client({
         client_id: clientId,
         client_secret: clientSecret,
-        token_endpoint_auth_method: authMethod
+        token_endpoint_auth_method: authMethod,
     });
 
     // Increase default timeout and clock tolerance
@@ -107,22 +118,24 @@ exports.getOidcTokenClientCredentials = async (tokenEndpoint, clientId, clientSe
  */
 exports.tcping = function (hostname, port) {
     return new Promise((resolve, reject) => {
-        tcpp.ping({
-            address: hostname,
-            port: port,
-            attempts: 1,
-        }, function (err, data) {
+        tcpp.ping(
+            {
+                address: hostname,
+                port: port,
+                attempts: 1,
+            },
+            function (err, data) {
+                if (err) {
+                    reject(err);
+                }
 
-            if (err) {
-                reject(err);
-            }
+                if (data.results.length >= 1 && data.results[0].err) {
+                    reject(data.results[0].err);
+                }
 
-            if (data.results.length >= 1 && data.results[0].err) {
-                reject(data.results[0].err);
-            }
-
-            resolve(Math.round(data.max));
-        });
+                resolve(Math.round(data.max));
+            },
+        );
     });
 };
 
@@ -147,14 +160,32 @@ exports.ping = async (
     timeout = PING_PER_REQUEST_TIMEOUT_DEFAULT,
 ) => {
     try {
-        return await exports.pingAsync(destAddr, false, count, sourceAddr, numeric, size, deadline, timeout);
+        return await exports.pingAsync(
+            destAddr,
+            false,
+            count,
+            sourceAddr,
+            numeric,
+            size,
+            deadline,
+            timeout,
+        );
     } catch (e) {
         // If the host cannot be resolved, try again with ipv6
         log.debug("ping", "IPv6 error message: " + e.message);
 
         // As node-ping does not report a specific error for this, try again if it is an empty message with ipv6 no matter what.
         if (!e.message) {
-            return await exports.pingAsync(destAddr, true, count, sourceAddr, numeric, size, deadline, timeout);
+            return await exports.pingAsync(
+                destAddr,
+                true,
+                count,
+                sourceAddr,
+                numeric,
+                size,
+                deadline,
+                timeout,
+            );
         } else {
             throw e;
         }
@@ -184,28 +215,31 @@ exports.pingAsync = function (
     timeout = PING_PER_REQUEST_TIMEOUT_DEFAULT,
 ) {
     return new Promise((resolve, reject) => {
-        ping.promise.probe(destAddr, {
-            v6: ipv6,
-            min_reply: count,
-            sourceAddr: sourceAddr,
-            numeric: numeric,
-            packetSize: size,
-            deadline: deadline,
-            timeout: timeout
-        }).then((res) => {
-            // If ping failed, it will set field to unknown
-            if (res.alive) {
-                resolve(res.time);
-            } else {
-                if (isWindows) {
-                    reject(new Error(exports.convertToUTF8(res.output)));
+        ping.promise
+            .probe(destAddr, {
+                v6: ipv6,
+                min_reply: count,
+                sourceAddr: sourceAddr,
+                numeric: numeric,
+                packetSize: size,
+                deadline: deadline,
+                timeout: timeout,
+            })
+            .then((res) => {
+                // If ping failed, it will set field to unknown
+                if (res.alive) {
+                    resolve(res.time);
                 } else {
-                    reject(new Error(res.output));
+                    if (isWindows) {
+                        reject(new Error(exports.convertToUTF8(res.output)));
+                    } else {
+                        reject(new Error(res.output));
+                    }
                 }
-            }
-        }).catch((err) => {
-            reject(err);
-        });
+            })
+            .catch((err) => {
+                reject(err);
+            });
     });
 };
 
@@ -223,17 +257,31 @@ exports.pingAsync = function (
  * Authentication (SASL) (defaults to {})
  * @returns {Promise<string>} Status message
  */
-exports.kafkaProducerAsync = function (brokers, topic, message, options = {}, saslOptions = {}) {
+exports.kafkaProducerAsync = function (
+    brokers,
+    topic,
+    message,
+    options = {},
+    saslOptions = {},
+) {
     return new Promise((resolve, reject) => {
-        const { interval = 20, allowAutoTopicCreation = false, ssl = false, clientId = "Uptime-Kuma" } = options;
+        const {
+            interval = 20,
+            allowAutoTopicCreation = false,
+            ssl = false,
+            clientId = "Uptime-Kuma",
+        } = options;
 
         let connectedToKafka = false;
 
-        const timeoutID = setTimeout(() => {
-            log.debug("kafkaProducer", "KafkaProducer timeout triggered");
-            connectedToKafka = true;
-            reject(new Error("Timeout"));
-        }, interval * 1000 * 0.8);
+        const timeoutID = setTimeout(
+            () => {
+                log.debug("kafkaProducer", "KafkaProducer timeout triggered");
+                connectedToKafka = true;
+                reject(new Error("Timeout"));
+            },
+            interval * 1000 * 0.8,
+        );
 
         if (saslOptions.mechanism === "None") {
             saslOptions = undefined;
@@ -253,36 +301,43 @@ exports.kafkaProducerAsync = function (brokers, topic, message, options = {}, sa
             allowAutoTopicCreation: allowAutoTopicCreation,
             retry: {
                 retries: 0,
-            }
+            },
         });
 
-        producer.connect().then(
-            () => {
-                producer.send({
-                    topic: topic,
-                    messages: [{
-                        value: message,
-                    }],
-                }).then((_) => {
-                    resolve("Message sent successfully");
-                }).catch((e) => {
-                    connectedToKafka = true;
-                    producer.disconnect();
-                    clearTimeout(timeoutID);
-                    reject(new Error("Error sending message: " + e.message));
-                }).finally(() => {
-                    connectedToKafka = true;
-                    clearTimeout(timeoutID);
-                });
-            }
-        ).catch(
-            (e) => {
+        producer
+            .connect()
+            .then(() => {
+                producer
+                    .send({
+                        topic: topic,
+                        messages: [
+                            {
+                                value: message,
+                            },
+                        ],
+                    })
+                    .then((_) => {
+                        resolve("Message sent successfully");
+                    })
+                    .catch((e) => {
+                        connectedToKafka = true;
+                        producer.disconnect();
+                        clearTimeout(timeoutID);
+                        reject(
+                            new Error("Error sending message: " + e.message),
+                        );
+                    })
+                    .finally(() => {
+                        connectedToKafka = true;
+                        clearTimeout(timeoutID);
+                    });
+            })
+            .catch((e) => {
                 connectedToKafka = true;
                 producer.disconnect();
                 clearTimeout(timeoutID);
                 reject(new Error("Error in producer connection: " + e.message));
-            }
-        );
+            });
 
         producer.on("producer.network.request_timeout", (_) => {
             if (!connectedToKafka) {
@@ -333,7 +388,7 @@ exports.dnsResolve = function (hostname, resolverServer, resolverPort, rrtype) {
     // Remove brackets from IPv6 addresses so we can re-add them to
     // prevent issues with ::1:5300 (::1 port 5300)
     resolverServer = resolverServer.replace("[", "").replace("]", "");
-    resolver.setServers([ `[${resolverServer}]:${resolverPort}` ]);
+    resolver.setServers([`[${resolverServer}]:${resolverPort}`]);
     return new Promise((resolve, reject) => {
         if (rrtype === "PTR") {
             resolver.reverse(hostname, (err, records) => {
@@ -416,7 +471,10 @@ exports.postgresQuery = function (connectionString, query) {
                 // Connected here
                 try {
                     // No query provided by user, use SELECT 1
-                    if (!query || (typeof query === "string" && query.trim() === "")) {
+                    if (
+                        !query ||
+                        (typeof query === "string" && query.trim() === "")
+                    ) {
                         query = "SELECT 1";
                     }
 
@@ -434,7 +492,6 @@ exports.postgresQuery = function (connectionString, query) {
                 }
             }
         });
-
     });
 };
 
@@ -449,7 +506,7 @@ exports.mysqlQuery = function (connectionString, query, password = undefined) {
     return new Promise((resolve, reject) => {
         const connection = mysql.createConnection({
             uri: connectionString,
-            password
+            password,
         });
 
         connection.on("error", (err) => {
@@ -463,7 +520,10 @@ exports.mysqlQuery = function (connectionString, query, password = undefined) {
                 if (Array.isArray(res)) {
                     resolve("Rows: " + res.length);
                 } else {
-                    resolve("No Error, but the result is not an array. Type: " + typeof res);
+                    resolve(
+                        "No Error, but the result is not an array. Type: " +
+                            typeof res,
+                    );
                 }
             }
 
@@ -503,24 +563,26 @@ exports.radius = function (
         hostPort: port,
         timeout: timeout,
         retries: 1,
-        dictionaries: [ file ],
+        dictionaries: [file],
     });
 
-    return client.accessRequest({
-        secret: secret,
-        attributes: [
-            [ attributes.USER_NAME, username ],
-            [ attributes.USER_PASSWORD, password ],
-            [ attributes.CALLING_STATION_ID, callingStationId ],
-            [ attributes.CALLED_STATION_ID, calledStationId ],
-        ],
-    }).catch((error) => {
-        if (error.response?.code) {
-            throw Error(error.response.code);
-        } else {
-            throw Error(error.message);
-        }
-    });
+    return client
+        .accessRequest({
+            secret: secret,
+            attributes: [
+                [attributes.USER_NAME, username],
+                [attributes.USER_PASSWORD, password],
+                [attributes.CALLING_STATION_ID, callingStationId],
+                [attributes.CALLED_STATION_ID, calledStationId],
+            ],
+        })
+        .catch((error) => {
+            if (error.response?.code) {
+                throw Error(error.response.code);
+            } else {
+                throw Error(error.message);
+            }
+        });
 };
 
 /**
@@ -534,8 +596,8 @@ exports.redisPingAsync = function (dsn, rejectUnauthorized) {
         const client = redis.createClient({
             url: dsn,
             socket: {
-                rejectUnauthorized
-            }
+                rejectUnauthorized,
+            },
         });
         client.on("error", (err) => {
             if (client.isOpen) {
@@ -547,16 +609,19 @@ exports.redisPingAsync = function (dsn, rejectUnauthorized) {
             if (!client.isOpen) {
                 client.emit("error", new Error("connection isn't open"));
             }
-            client.ping().then((res, err) => {
-                if (client.isOpen) {
-                    client.disconnect();
-                }
-                if (err) {
-                    reject(err);
-                } else {
-                    resolve(res);
-                }
-            }).catch(error => reject(error));
+            client
+                .ping()
+                .then((res, err) => {
+                    if (client.isOpen) {
+                        client.disconnect();
+                    }
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(res);
+                    }
+                })
+                .catch((error) => reject(error));
         });
     });
 };
@@ -646,23 +711,25 @@ const parseCertificateInfo = function (info) {
             break;
         }
         link.validTo = new Date(link.valid_to);
-        link.validFor = link.subjectaltname?.replace(/DNS:|IP Address:/g, "").split(", ");
+        link.validFor = link.subjectaltname
+            ?.replace(/DNS:|IP Address:/g, "")
+            .split(", ");
         link.daysRemaining = getDaysRemaining(new Date(), link.validTo);
 
         existingList[link.fingerprint] = true;
 
         // Move up the chain until loop is encountered
         if (link.issuerCertificate == null) {
-            link.certType = (i === 0) ? "self-signed" : "root CA";
+            link.certType = i === 0 ? "self-signed" : "root CA";
             break;
         } else if (link.issuerCertificate.fingerprint in existingList) {
             // a root CA certificate is typically "signed by itself"  (=> "self signed certificate") and thus the "issuerCertificate" is a reference to itself.
             log.debug("cert", `[Last] ${link.issuerCertificate.fingerprint}`);
-            link.certType = (i === 0) ? "self-signed" : "root CA";
+            link.certType = i === 0 ? "self-signed" : "root CA";
             link.issuerCertificate = null;
             break;
         } else {
-            link.certType = (i === 0) ? "server" : "intermediate CA";
+            link.certType = i === 0 ? "server" : "intermediate CA";
             link = link.issuerCertificate;
         }
 
@@ -696,12 +763,17 @@ exports.checkCertificate = function (socket) {
     const parsedInfo = parseCertificateInfo(info);
 
     if (process.env.TIMELOGGER === "1") {
-        log.debug("monitor", "Cert Info Query Time: " + (dayjs().valueOf() - certInfoStartTime) + "ms");
+        log.debug(
+            "monitor",
+            "Cert Info Query Time: " +
+                (dayjs().valueOf() - certInfoStartTime) +
+                "ms",
+        );
     }
 
     return {
         valid: valid,
-        certInfo: parsedInfo
+        certInfo: parsedInfo,
     };
 };
 
@@ -718,11 +790,16 @@ exports.checkStatusCode = function (status, acceptedCodes) {
 
     for (const codeRange of acceptedCodes) {
         if (typeof codeRange !== "string") {
-            log.error("monitor", `Accepted status code not a string. ${codeRange} is of type ${typeof codeRange}`);
+            log.error(
+                "monitor",
+                `Accepted status code not a string. ${codeRange} is of type ${typeof codeRange}`,
+            );
             continue;
         }
 
-        const codeRangeSplit = codeRange.split("-").map(string => parseInt(string));
+        const codeRangeSplit = codeRange
+            .split("-")
+            .map((string) => parseInt(string));
         if (codeRangeSplit.length === 1) {
             if (status === codeRangeSplit[0]) {
                 return true;
@@ -732,7 +809,10 @@ exports.checkStatusCode = function (status, acceptedCodes) {
                 return true;
             }
         } else {
-            log.error("monitor", `${codeRange} is not a valid status code range`);
+            log.error(
+                "monitor",
+                `${codeRange} is not a valid status code range`,
+            );
             continue;
         }
     }
@@ -747,7 +827,6 @@ exports.checkStatusCode = function (status, acceptedCodes) {
  * @returns {number} Total clients in room
  */
 exports.getTotalClientInRoom = (io, roomName) => {
-
     const sockets = io.sockets;
 
     if (!sockets) {
@@ -787,8 +866,14 @@ exports.allowDevAllOrigin = (res) => {
  */
 exports.allowAllOrigin = (res) => {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE, OPTIONS");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header(
+        "Access-Control-Allow-Methods",
+        "GET, PUT, POST, DELETE, OPTIONS",
+    );
+    res.header(
+        "Access-Control-Allow-Headers",
+        "Origin, X-Requested-With, Content-Type, Accept",
+    );
 };
 
 /**
@@ -875,18 +960,18 @@ exports.filterAndJoin = (parts, connector = "") => {
 module.exports.sendHttpError = (res, msg = "") => {
     if (msg.includes("SQLITE_BUSY") || msg.includes("SQLITE_LOCKED")) {
         res.status(503).json({
-            "status": "fail",
-            "msg": msg,
+            status: "fail",
+            msg: msg,
         });
     } else if (msg.toLowerCase().includes("not found")) {
         res.status(404).json({
-            "status": "fail",
-            "msg": msg,
+            status: "fail",
+            msg: msg,
         });
     } else {
         res.status(403).json({
-            "status": "fail",
-            "msg": msg,
+            status: "fail",
+            msg: msg,
         });
     }
 };
@@ -965,55 +1050,71 @@ module.exports.timeObjectToLocal = (obj, timezone = undefined) => {
  * @returns {Promise<object>} Result of gRPC query
  */
 module.exports.grpcQuery = async (options) => {
-    const { grpcUrl, grpcProtobufData, grpcServiceName, grpcEnableTls, grpcMethod, grpcBody } = options;
+    const {
+        grpcUrl,
+        grpcProtobufData,
+        grpcServiceName,
+        grpcEnableTls,
+        grpcMethod,
+        grpcBody,
+    } = options;
     const protocObject = protojs.parse(grpcProtobufData);
     const protoServiceObject = protocObject.root.lookupService(grpcServiceName);
     const Client = grpc.makeGenericClientConstructor({});
-    const credentials = grpcEnableTls ? grpc.credentials.createSsl() : grpc.credentials.createInsecure();
-    const client = new Client(
-        grpcUrl,
-        credentials
+    const credentials = grpcEnableTls
+        ? grpc.credentials.createSsl()
+        : grpc.credentials.createInsecure();
+    const client = new Client(grpcUrl, credentials);
+    const grpcService = protoServiceObject.create(
+        function (method, requestData, cb) {
+            const fullServiceName = method.fullName;
+            const serviceFQDN = fullServiceName.split(".");
+            const serviceMethod = serviceFQDN.pop();
+            const serviceMethodClientImpl = `/${serviceFQDN.slice(1).join(".")}/${serviceMethod}`;
+            log.debug("monitor", `gRPC method ${serviceMethodClientImpl}`);
+            client.makeUnaryRequest(
+                serviceMethodClientImpl,
+                (arg) => arg,
+                (arg) => arg,
+                requestData,
+                cb,
+            );
+        },
+        false,
+        false,
     );
-    const grpcService = protoServiceObject.create(function (method, requestData, cb) {
-        const fullServiceName = method.fullName;
-        const serviceFQDN = fullServiceName.split(".");
-        const serviceMethod = serviceFQDN.pop();
-        const serviceMethodClientImpl = `/${serviceFQDN.slice(1).join(".")}/${serviceMethod}`;
-        log.debug("monitor", `gRPC method ${serviceMethodClientImpl}`);
-        client.makeUnaryRequest(
-            serviceMethodClientImpl,
-            arg => arg,
-            arg => arg,
-            requestData,
-            cb);
-    }, false, false);
     return new Promise((resolve, _) => {
         try {
-            return grpcService[`${grpcMethod}`](JSON.parse(grpcBody), function (err, response) {
-                const responseData = JSON.stringify(response);
-                if (err) {
-                    return resolve({
-                        code: err.code,
-                        errorMessage: err.details,
-                        data: ""
-                    });
-                } else {
-                    log.debug("monitor:", `gRPC response: ${JSON.stringify(response)}`);
-                    return resolve({
-                        code: 1,
-                        errorMessage: "",
-                        data: responseData
-                    });
-                }
-            });
+            return grpcService[`${grpcMethod}`](
+                JSON.parse(grpcBody),
+                function (err, response) {
+                    const responseData = JSON.stringify(response);
+                    if (err) {
+                        return resolve({
+                            code: err.code,
+                            errorMessage: err.details,
+                            data: "",
+                        });
+                    } else {
+                        log.debug(
+                            "monitor:",
+                            `gRPC response: ${JSON.stringify(response)}`,
+                        );
+                        return resolve({
+                            code: 1,
+                            errorMessage: "",
+                            data: responseData,
+                        });
+                    }
+                },
+            );
         } catch (err) {
             return resolve({
                 code: -1,
                 errorMessage: `Error ${err}. Please review your gRPC configuration option. The service name must not include package name value, and the method name must follow camelCase format`,
-                data: ""
+                data: "",
             });
         }
-
     });
 };
 
@@ -1022,7 +1123,7 @@ module.exports.grpcQuery = async (options) => {
  * @returns {Set} A set of SHA256 fingerprints.
  */
 module.exports.rootCertificatesFingerprints = () => {
-    let fingerprints = tls.rootCertificates.map(cert => {
+    let fingerprints = tls.rootCertificates.map((cert) => {
         let certLines = cert.split("\n");
         certLines.shift();
         certLines.pop();
@@ -1032,11 +1133,18 @@ module.exports.rootCertificatesFingerprints = () => {
         const shasum = crypto.createHash("sha256");
         shasum.update(buf);
 
-        return shasum.digest("hex").toUpperCase().replace(/(.{2})(?!$)/g, "$1:");
+        return shasum
+            .digest("hex")
+            .toUpperCase()
+            .replace(/(.{2})(?!$)/g, "$1:");
     });
 
-    fingerprints.push("6D:99:FB:26:5E:B1:C5:B3:74:47:65:FC:BC:64:8F:3C:D8:E1:BF:FA:FD:C4:C2:F9:9B:9D:47:CF:7F:F1:C2:4F"); // ISRG X1 cross-signed with DST X3
-    fingerprints.push("8B:05:B6:8C:C6:59:E5:ED:0F:CB:38:F2:C9:42:FB:FD:20:0E:6F:2F:F9:F8:5D:63:C6:99:4E:F5:E0:B0:27:01"); // ISRG X2 cross-signed with ISRG X1
+    fingerprints.push(
+        "6D:99:FB:26:5E:B1:C5:B3:74:47:65:FC:BC:64:8F:3C:D8:E1:BF:FA:FD:C4:C2:F9:9B:9D:47:CF:7F:F1:C2:4F",
+    ); // ISRG X1 cross-signed with DST X3
+    fingerprints.push(
+        "8B:05:B6:8C:C6:59:E5:ED:0F:CB:38:F2:C9:42:FB:FD:20:0E:6F:2F:F9:F8:5D:63:C6:99:4E:F5:E0:B0:27:01",
+    ); // ISRG X2 cross-signed with ISRG X1
 
     return new Set(fingerprints);
 };
@@ -1052,7 +1160,8 @@ module.exports.shake256 = (data, len) => {
     if (!data) {
         return "";
     }
-    return crypto.createHash("shake256", { outputLength: len })
+    return crypto
+        .createHash("shake256", { outputLength: len })
         .update(data)
         .digest("hex");
 };

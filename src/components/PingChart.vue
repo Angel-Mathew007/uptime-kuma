@@ -2,7 +2,9 @@
     <div>
         <div class="period-options">
             <button
-                type="button" class="btn btn-light dropdown-toggle btn-period-toggle" data-bs-toggle="dropdown"
+                type="button"
+                class="btn btn-light dropdown-toggle btn-period-toggle"
+                data-bs-toggle="dropdown"
                 aria-expanded="false"
             >
                 {{ chartPeriodOptions[chartPeriodHrs] }}&nbsp;
@@ -10,7 +12,9 @@
             <ul class="dropdown-menu dropdown-menu-end">
                 <li v-for="(item, key) in chartPeriodOptions" :key="key">
                     <button
-                        type="button" class="dropdown-item" :class="{ active: chartPeriodHrs == key }"
+                        type="button"
+                        class="dropdown-item"
+                        :class="{ active: chartPeriodHrs == key }"
                         @click="chartPeriodHrs = key"
                     >
                         {{ item }}
@@ -25,12 +29,33 @@
 </template>
 
 <script lang="js">
-import { BarController, BarElement, Chart, Filler, LinearScale, LineController, LineElement, PointElement, TimeScale, Tooltip } from "chart.js";
+import {
+    BarController,
+    BarElement,
+    Chart,
+    Filler,
+    LinearScale,
+    LineController,
+    LineElement,
+    PointElement,
+    TimeScale,
+    Tooltip,
+} from "chart.js";
 import "chartjs-adapter-dayjs-4";
 import { Line } from "vue-chartjs";
 import { UP, DOWN, PENDING, MAINTENANCE } from "../util.ts";
 
-Chart.register(LineController, BarController, LineElement, PointElement, TimeScale, BarElement, LinearScale, Tooltip, Filler);
+Chart.register(
+    LineController,
+    BarController,
+    LineElement,
+    PointElement,
+    TimeScale,
+    BarElement,
+    LinearScale,
+    Tooltip,
+    Filler,
+);
 
 export default {
     components: { Line },
@@ -43,7 +68,6 @@ export default {
     },
     data() {
         return {
-
             loading: false,
 
             // Time period for the chart to display, in hours
@@ -105,7 +129,7 @@ export default {
                             displayFormats: {
                                 minute: "HH:mm",
                                 hour: "MM-DD HH:mm",
-                            }
+                            },
                         },
                         ticks: {
                             sampleSize: 3,
@@ -114,7 +138,10 @@ export default {
                             padding: 3,
                         },
                         grid: {
-                            color: this.$root.theme === "light" ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)",
+                            color:
+                                this.$root.theme === "light"
+                                    ? "rgba(0,0,0,0.1)"
+                                    : "rgba(255,255,255,0.1)",
                             offset: false,
                         },
                     },
@@ -125,7 +152,10 @@ export default {
                         },
                         offset: false,
                         grid: {
-                            color: this.$root.theme === "light" ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)",
+                            color:
+                                this.$root.theme === "light"
+                                    ? "rgba(0,0,0,0.1)"
+                                    : "rgba(255,255,255,0.1)",
                         },
                     },
                     y1: {
@@ -145,17 +175,26 @@ export default {
                         mode: "nearest",
                         intersect: false,
                         padding: 10,
-                        backgroundColor: this.$root.theme === "light" ? "rgba(212,232,222,1.0)" : "rgba(32,42,38,1.0)",
-                        bodyColor: this.$root.theme === "light" ? "rgba(12,12,18,1.0)" : "rgba(220,220,220,1.0)",
-                        titleColor: this.$root.theme === "light" ? "rgba(12,12,18,1.0)" : "rgba(220,220,220,1.0)",
+                        backgroundColor:
+                            this.$root.theme === "light"
+                                ? "rgba(212,232,222,1.0)"
+                                : "rgba(32,42,38,1.0)",
+                        bodyColor:
+                            this.$root.theme === "light"
+                                ? "rgba(12,12,18,1.0)"
+                                : "rgba(220,220,220,1.0)",
+                        titleColor:
+                            this.$root.theme === "light"
+                                ? "rgba(12,12,18,1.0)"
+                                : "rgba(220,220,220,1.0)",
                         filter: function (tooltipItem) {
-                            return tooltipItem.datasetIndex === 0;  // Hide tooltip on Bar Chart
+                            return tooltipItem.datasetIndex === 0; // Hide tooltip on Bar Chart
                         },
                         callbacks: {
                             label: (context) => {
                                 return ` ${new Intl.NumberFormat().format(context.parsed.y)} ms`;
                             },
-                        }
+                        },
                     },
                     legend: {
                         display: false,
@@ -194,25 +233,36 @@ export default {
                     period = 24;
                 }
 
-                this.$root.getMonitorChartData(this.monitorId, period, (res) => {
-                    if (!res.ok) {
-                        this.$root.toastError(res.msg);
-                    } else {
-                        this.chartRawData = res.data;
-                        this.$root.storage()["chart-period"] = newPeriod;
-                    }
-                    this.loading = false;
-                });
-
-                this.chartDataFetchInterval = setInterval(() => {
-                    this.$root.getMonitorChartData(this.monitorId, period, (res) => {
-                        if (res.ok) {
+                this.$root.getMonitorChartData(
+                    this.monitorId,
+                    period,
+                    (res) => {
+                        if (!res.ok) {
+                            this.$root.toastError(res.msg);
+                        } else {
                             this.chartRawData = res.data;
+                            this.$root.storage()["chart-period"] = newPeriod;
                         }
-                    });
-                }, 5 * 60 * 1000);
+                        this.loading = false;
+                    },
+                );
+
+                this.chartDataFetchInterval = setInterval(
+                    () => {
+                        this.$root.getMonitorChartData(
+                            this.monitorId,
+                            period,
+                            (res) => {
+                                if (res.ok) {
+                                    this.chartRawData = res.data;
+                                }
+                            },
+                        );
+                    },
+                    5 * 60 * 1000,
+                );
             }
-        }
+        },
     },
     created() {
         // Load chart period from storage if saved
@@ -250,21 +300,37 @@ export default {
             }
         },
         // push datapoint to chartData
-        pushDatapoint(datapoint, avgPingData, minPingData, maxPingData, downData, colorData) {
+        pushDatapoint(
+            datapoint,
+            avgPingData,
+            minPingData,
+            maxPingData,
+            downData,
+            colorData,
+        ) {
             const x = this.$root.unixToDateTime(datapoint.timestamp);
 
             // Show ping values if it was up in this period
             avgPingData.push({
                 x,
-                y: datapoint.up > 0 && datapoint.avgPing > 0 ? datapoint.avgPing : null,
+                y:
+                    datapoint.up > 0 && datapoint.avgPing > 0
+                        ? datapoint.avgPing
+                        : null,
             });
             minPingData.push({
                 x,
-                y: datapoint.up > 0 && datapoint.avgPing > 0 ? datapoint.minPing : null,
+                y:
+                    datapoint.up > 0 && datapoint.avgPing > 0
+                        ? datapoint.minPing
+                        : null,
             });
             maxPingData.push({
                 x,
-                y: datapoint.up > 0 && datapoint.avgPing > 0 ? datapoint.maxPing : null,
+                y:
+                    datapoint.up > 0 && datapoint.avgPing > 0
+                        ? datapoint.maxPing
+                        : null,
             });
             downData.push({
                 x,
@@ -275,12 +341,30 @@ export default {
         },
         // get the average of a set of datapoints
         getAverage(datapoints) {
-            const totalUp = datapoints.reduce((total, current) => total + current.up, 0);
-            const totalDown = datapoints.reduce((total, current) => total + current.down, 0);
-            const totalMaintenance = datapoints.reduce((total, current) => total + (current.maintenance || 0), 0);
-            const totalPing = datapoints.reduce((total, current) => total + current.avgPing * current.up, 0);
-            const minPing = datapoints.reduce((min, current) => Math.min(min, current.minPing), Infinity);
-            const maxPing = datapoints.reduce((max, current) => Math.max(max, current.maxPing), 0);
+            const totalUp = datapoints.reduce(
+                (total, current) => total + current.up,
+                0,
+            );
+            const totalDown = datapoints.reduce(
+                (total, current) => total + current.down,
+                0,
+            );
+            const totalMaintenance = datapoints.reduce(
+                (total, current) => total + (current.maintenance || 0),
+                0,
+            );
+            const totalPing = datapoints.reduce(
+                (total, current) => total + current.avgPing * current.up,
+                0,
+            );
+            const minPing = datapoints.reduce(
+                (min, current) => Math.min(min, current.minPing),
+                Infinity,
+            );
+            const maxPing = datapoints.reduce(
+                (max, current) => Math.max(max, current.maxPing),
+                0,
+            );
 
             // Find the middle timestamp to use
             let midpoint = Math.floor(datapoints.length / 2);
@@ -289,7 +373,8 @@ export default {
                 timestamp: datapoints[midpoint].timestamp,
                 up: totalUp,
                 down: totalDown,
-                maintenance: totalMaintenance > 0 ? totalMaintenance : undefined,
+                maintenance:
+                    totalMaintenance > 0 ? totalMaintenance : undefined,
                 avgPing: totalUp > 0 ? totalPing / totalUp : 0,
                 minPing,
                 maxPing,
@@ -298,12 +383,16 @@ export default {
         getChartDatapointsFromHeartbeatList() {
             // Render chart using heartbeatList
             let lastHeartbeatTime;
-            const monitorInterval = this.$root.monitorList[this.monitorId]?.interval;
-            let pingData = [];  // Ping Data for Line Chart, y-axis contains ping time
-            let downData = [];  // Down Data for Bar Chart, y-axis is 1 if target is down (red color), under maintenance (blue color) or pending (orange color), 0 if target is up
+            const monitorInterval =
+                this.$root.monitorList[this.monitorId]?.interval;
+            let pingData = []; // Ping Data for Line Chart, y-axis contains ping time
+            let downData = []; // Down Data for Bar Chart, y-axis is 1 if target is down (red color), under maintenance (blue color) or pending (orange color), 0 if target is up
             let colorData = []; // Color Data for Bar Chart
 
-            let heartbeatList = (this.monitorId in this.$root.heartbeatList && this.$root.heartbeatList[this.monitorId]) || [];
+            let heartbeatList =
+                (this.monitorId in this.$root.heartbeatList &&
+                    this.$root.heartbeatList[this.monitorId]) ||
+                [];
 
             for (const beat of heartbeatList) {
                 const beatTime = this.$root.toDayjs(beat.time);
@@ -315,8 +404,12 @@ export default {
                     if (diff > monitorInterval * 1000 * 10) {
                         // Big gap detected
                         const gapX = [
-                            lastHeartbeatTime.add(monitorInterval, "second").format("YYYY-MM-DD HH:mm:ss"),
-                            beatTime.subtract(monitorInterval, "second").format("YYYY-MM-DD HH:mm:ss")
+                            lastHeartbeatTime
+                                .add(monitorInterval, "second")
+                                .format("YYYY-MM-DD HH:mm:ss"),
+                            beatTime
+                                .subtract(monitorInterval, "second")
+                                .format("YYYY-MM-DD HH:mm:ss"),
                         ];
 
                         for (const x of gapX) {
@@ -330,7 +423,6 @@ export default {
                             });
                             colorData.push("#000");
                         }
-
                     }
                 }
 
@@ -340,7 +432,12 @@ export default {
                 });
                 downData.push({
                     x,
-                    y: (beat.status === DOWN || beat.status === MAINTENANCE || beat.status === PENDING) ? 1 : 0,
+                    y:
+                        beat.status === DOWN ||
+                        beat.status === MAINTENANCE ||
+                        beat.status === PENDING
+                            ? 1
+                            : 0,
                 });
                 switch (beat.status) {
                     case MAINTENANCE:
@@ -387,12 +484,13 @@ export default {
         getChartDatapointsFromStats() {
             // Render chart using UptimeCalculator data
             let lastHeartbeatTime;
-            const monitorInterval = this.$root.monitorList[this.monitorId]?.interval;
+            const monitorInterval =
+                this.$root.monitorList[this.monitorId]?.interval;
 
-            let avgPingData = [];  // Ping Data for Line Chart, y-axis contains ping time
-            let minPingData = [];  // Ping Data for Line Chart, y-axis contains ping time
-            let maxPingData = [];  // Ping Data for Line Chart, y-axis contains ping time
-            let downData = [];  // Down Data for Bar Chart, y-axis is number of down datapoints in this period
+            let avgPingData = []; // Ping Data for Line Chart, y-axis contains ping time
+            let minPingData = []; // Ping Data for Line Chart, y-axis contains ping time
+            let maxPingData = []; // Ping Data for Line Chart, y-axis contains ping time
+            let downData = []; // Down Data for Bar Chart, y-axis is number of down datapoints in this period
             let colorData = []; // Color Data for Bar Chart
 
             const period = parseInt(this.chartPeriodHrs);
@@ -403,11 +501,17 @@ export default {
             if (this.chartRawData) {
                 for (const datapoint of this.chartRawData) {
                     // Empty datapoints are ignored
-                    if (datapoint.up === 0 && datapoint.down === 0 && datapoint.maintenance === 0) {
+                    if (
+                        datapoint.up === 0 &&
+                        datapoint.down === 0 &&
+                        datapoint.maintenance === 0
+                    ) {
                         continue;
                     }
 
-                    const beatTime = this.$root.unixToDayjs(datapoint.timestamp);
+                    const beatTime = this.$root.unixToDayjs(
+                        datapoint.timestamp,
+                    );
 
                     // Insert empty datapoint to separate big gaps
                     if (lastHeartbeatTime && monitorInterval) {
@@ -415,19 +519,43 @@ export default {
                         const oneSecond = 1000;
                         const oneMinute = oneSecond * 60;
                         const oneHour = oneMinute * 60;
-                        if ((period <= 24 && diff > Math.max(oneMinute * 10, monitorInterval * oneSecond * 10)) ||
-                            (period > 24 && diff > Math.max(oneHour * 10, monitorInterval * oneSecond * 10))) {
+                        if (
+                            (period <= 24 &&
+                                diff >
+                                    Math.max(
+                                        oneMinute * 10,
+                                        monitorInterval * oneSecond * 10,
+                                    )) ||
+                            (period > 24 &&
+                                diff >
+                                    Math.max(
+                                        oneHour * 10,
+                                        monitorInterval * oneSecond * 10,
+                                    ))
+                        ) {
                             // Big gap detected
                             // Clear the aggregate buffer
                             if (aggregateBuffer.length > 0) {
-                                const average = this.getAverage(aggregateBuffer);
-                                this.pushDatapoint(average, avgPingData, minPingData, maxPingData, downData, colorData);
+                                const average =
+                                    this.getAverage(aggregateBuffer);
+                                this.pushDatapoint(
+                                    average,
+                                    avgPingData,
+                                    minPingData,
+                                    maxPingData,
+                                    downData,
+                                    colorData,
+                                );
                                 aggregateBuffer = [];
                             }
 
                             const gapX = [
-                                lastHeartbeatTime.subtract(monitorInterval, "second").format("YYYY-MM-DD HH:mm:ss"),
-                                this.$root.unixToDateTime(datapoint.timestamp + 60),
+                                lastHeartbeatTime
+                                    .subtract(monitorInterval, "second")
+                                    .format("YYYY-MM-DD HH:mm:ss"),
+                                this.$root.unixToDateTime(
+                                    datapoint.timestamp + 60,
+                                ),
                             ];
 
                             for (const x of gapX) {
@@ -449,30 +577,55 @@ export default {
                                 });
                                 colorData.push("#000");
                             }
-
                         }
                     }
 
-                    if (datapoint.up > 0 && this.chartRawData.length > aggregatePoints * 2) {
+                    if (
+                        datapoint.up > 0 &&
+                        this.chartRawData.length > aggregatePoints * 2
+                    ) {
                         // Aggregate Up data using a sliding window
                         aggregateBuffer.push(datapoint);
 
                         if (aggregateBuffer.length === aggregatePoints) {
                             const average = this.getAverage(aggregateBuffer);
-                            this.pushDatapoint(average, avgPingData, minPingData, maxPingData, downData, colorData);
+                            this.pushDatapoint(
+                                average,
+                                avgPingData,
+                                minPingData,
+                                maxPingData,
+                                downData,
+                                colorData,
+                            );
                             // Remove the first half of the buffer
-                            aggregateBuffer = aggregateBuffer.slice(Math.floor(aggregatePoints / 2));
+                            aggregateBuffer = aggregateBuffer.slice(
+                                Math.floor(aggregatePoints / 2),
+                            );
                         }
                     } else {
                         // datapoint is fully down or too few datapoints, no need to aggregate
                         // Clear the aggregate buffer
                         if (aggregateBuffer.length > 0) {
                             const average = this.getAverage(aggregateBuffer);
-                            this.pushDatapoint(average, avgPingData, minPingData, maxPingData, downData, colorData);
+                            this.pushDatapoint(
+                                average,
+                                avgPingData,
+                                minPingData,
+                                maxPingData,
+                                downData,
+                                colorData,
+                            );
                             aggregateBuffer = [];
                         }
 
-                        this.pushDatapoint(datapoint, avgPingData, minPingData, maxPingData, downData, colorData);
+                        this.pushDatapoint(
+                            datapoint,
+                            avgPingData,
+                            minPingData,
+                            maxPingData,
+                            downData,
+                            colorData,
+                        );
                     }
 
                     lastHeartbeatTime = beatTime;
@@ -480,7 +633,14 @@ export default {
                 // Clear the aggregate buffer if there are still datapoints
                 if (aggregateBuffer.length > 0) {
                     const average = this.getAverage(aggregateBuffer);
-                    this.pushDatapoint(average, avgPingData, minPingData, maxPingData, downData, colorData);
+                    this.pushDatapoint(
+                        average,
+                        avgPingData,
+                        minPingData,
+                        maxPingData,
+                        downData,
+                        colorData,
+                    );
                     aggregateBuffer = [];
                 }
             }
@@ -533,7 +693,7 @@ export default {
                 ],
             };
         },
-    }
+    },
 };
 </script>
 

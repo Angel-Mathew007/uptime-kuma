@@ -3,7 +3,9 @@
         <form @submit.prevent="submit">
             <div>
                 <object width="64" height="64" data="/icon.svg" />
-                <div style="font-size: 28px; font-weight: bold; margin-top: 5px;">
+                <div
+                    style="font-size: 28px; font-weight: bold; margin-top: 5px"
+                >
                     Uptime Kuma
                 </div>
             </div>
@@ -13,7 +15,11 @@
                     <div class="d-flex align-items-center">
                         <strong>{{ $t("settingUpDatabaseMSG") }}</strong>
                         <div class="ms-3 pt-1">
-                            <div class="spinner-border" role="status" aria-hidden="true"></div>
+                            <div
+                                class="spinner-border"
+                                role="status"
+                                aria-hidden="true"
+                            ></div>
                         </div>
                     </div>
                 </div>
@@ -21,39 +27,77 @@
 
             <template v-if="!info.runningSetup">
                 <div class="form-floating short mt-3">
-                    <select id="language" v-model="$root.language" class="form-select">
-                        <option v-for="(lang, i) in $i18n.availableLocales" :key="`Lang${i}`" :value="lang">
+                    <select
+                        id="language"
+                        v-model="$root.language"
+                        class="form-select"
+                    >
+                        <option
+                            v-for="(lang, i) in $i18n.availableLocales"
+                            :key="`Lang${i}`"
+                            :value="lang"
+                        >
                             {{ $i18n.messages[lang].languageName }}
                         </option>
                     </select>
-                    <label for="language" class="form-label">{{ $t("Language") }}</label>
+                    <label for="language" class="form-label">{{
+                        $t("Language")
+                    }}</label>
                 </div>
 
                 <p class="mt-5 short">
                     {{ $t("setupDatabaseChooseDatabase") }}
                 </p>
 
-                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                <div
+                    class="btn-group"
+                    role="group"
+                    aria-label="Basic radio toggle button group"
+                >
                     <template v-if="info.isEnabledEmbeddedMariaDB">
-                        <input id="btnradio3" v-model="dbConfig.type" type="radio" class="btn-check" autocomplete="off" value="embedded-mariadb">
+                        <input
+                            id="btnradio3"
+                            v-model="dbConfig.type"
+                            type="radio"
+                            class="btn-check"
+                            autocomplete="off"
+                            value="embedded-mariadb"
+                        />
 
                         <label class="btn btn-outline-primary" for="btnradio3">
                             Embedded MariaDB
                         </label>
                     </template>
 
-                    <input id="btnradio2" v-model="dbConfig.type" type="radio" class="btn-check" autocomplete="off" value="mariadb">
+                    <input
+                        id="btnradio2"
+                        v-model="dbConfig.type"
+                        type="radio"
+                        class="btn-check"
+                        autocomplete="off"
+                        value="mariadb"
+                    />
                     <label class="btn btn-outline-primary" for="btnradio2">
                         MariaDB/MySQL
                     </label>
 
-                    <input id="btnradio1" v-model="dbConfig.type" type="radio" class="btn-check" autocomplete="off" value="sqlite">
+                    <input
+                        id="btnradio1"
+                        v-model="dbConfig.type"
+                        type="radio"
+                        class="btn-check"
+                        autocomplete="off"
+                        value="sqlite"
+                    />
                     <label class="btn btn-outline-primary" for="btnradio1">
                         SQLite
                     </label>
                 </div>
 
-                <div v-if="dbConfig.type === 'embedded-mariadb'" class="mt-3 short">
+                <div
+                    v-if="dbConfig.type === 'embedded-mariadb'"
+                    class="mt-3 short"
+                >
                     {{ $t("setupDatabaseEmbeddedMariaDB") }}
                 </div>
 
@@ -67,32 +111,66 @@
 
                 <template v-if="dbConfig.type === 'mariadb'">
                     <div class="form-floating mt-3 short">
-                        <input id="floatingInput" v-model="dbConfig.hostname" type="text" class="form-control" required>
+                        <input
+                            id="floatingInput"
+                            v-model="dbConfig.hostname"
+                            type="text"
+                            class="form-control"
+                            required
+                        />
                         <label for="floatingInput">{{ $t("Hostname") }}</label>
                     </div>
 
                     <div class="form-floating mt-3 short">
-                        <input id="floatingInput" v-model="dbConfig.port" type="text" class="form-control" required>
+                        <input
+                            id="floatingInput"
+                            v-model="dbConfig.port"
+                            type="text"
+                            class="form-control"
+                            required
+                        />
                         <label for="floatingInput">{{ $t("Port") }}</label>
                     </div>
 
                     <div class="form-floating mt-3 short">
-                        <input id="floatingInput" v-model="dbConfig.username" type="text" class="form-control" required>
+                        <input
+                            id="floatingInput"
+                            v-model="dbConfig.username"
+                            type="text"
+                            class="form-control"
+                            required
+                        />
                         <label for="floatingInput">{{ $t("Username") }}</label>
                     </div>
 
                     <div class="form-floating mt-3 short">
-                        <input id="floatingInput" v-model="dbConfig.password" type="password" class="form-control" required>
+                        <input
+                            id="floatingInput"
+                            v-model="dbConfig.password"
+                            type="password"
+                            class="form-control"
+                            required
+                        />
                         <label for="floatingInput">{{ $t("Password") }}</label>
                     </div>
 
                     <div class="form-floating mt-3 short">
-                        <input id="floatingInput" v-model="dbConfig.dbName" type="text" class="form-control" required>
+                        <input
+                            id="floatingInput"
+                            v-model="dbConfig.dbName"
+                            type="text"
+                            class="form-control"
+                            required
+                        />
                         <label for="floatingInput">{{ $t("dbName") }}</label>
                     </div>
                 </template>
 
-                <button class="btn btn-primary mt-4 short" type="submit" :disabled="disabledButton">
+                <button
+                    class="btn btn-primary mt-4 short"
+                    type="submit"
+                    :disabled="disabledButton"
+                >
                     {{ $t("Next") }}
                 </button>
             </template>
@@ -155,7 +233,6 @@ export default {
             } finally {
                 this.info.runningSetup = false;
             }
-
         },
 
         async goToMainServerWhenReady() {
@@ -180,7 +257,7 @@ export default {
 
         test() {
             this.$root.toastError("not implemented");
-        }
+        },
     },
 };
 </script>

@@ -17,29 +17,38 @@ class LineNotify extends NotificationProvider {
             let config = {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
-                    "Authorization": "Bearer " + notification.lineNotifyAccessToken
-                }
+                    Authorization:
+                        "Bearer " + notification.lineNotifyAccessToken,
+                },
             };
             config = this.getAxiosConfigWithProxy(config);
             if (heartbeatJSON == null) {
                 let testMessage = {
-                    "message": msg,
+                    message: msg,
                 };
                 await axios.post(url, qs.stringify(testMessage), config);
             } else if (heartbeatJSON["status"] === DOWN) {
                 let downMessage = {
-                    "message": "\n[🔴 Down]\n" +
-                        "Name: " + monitorJSON["name"] + " \n" +
-                        heartbeatJSON["msg"] + "\n" +
-                        `Time (${heartbeatJSON["timezone"]}): ${heartbeatJSON["localDateTime"]}`
+                    message:
+                        "\n[🔴 Down]\n" +
+                        "Name: " +
+                        monitorJSON["name"] +
+                        " \n" +
+                        heartbeatJSON["msg"] +
+                        "\n" +
+                        `Time (${heartbeatJSON["timezone"]}): ${heartbeatJSON["localDateTime"]}`,
                 };
                 await axios.post(url, qs.stringify(downMessage), config);
             } else if (heartbeatJSON["status"] === UP) {
                 let upMessage = {
-                    "message": "\n[✅ Up]\n" +
-                        "Name: " + monitorJSON["name"] + " \n" +
-                        heartbeatJSON["msg"] + "\n" +
-                        `Time (${heartbeatJSON["timezone"]}): ${heartbeatJSON["localDateTime"]}`
+                    message:
+                        "\n[✅ Up]\n" +
+                        "Name: " +
+                        monitorJSON["name"] +
+                        " \n" +
+                        heartbeatJSON["msg"] +
+                        "\n" +
+                        `Time (${heartbeatJSON["timezone"]}): ${heartbeatJSON["localDateTime"]}`,
                 };
                 await axios.post(url, qs.stringify(upMessage), config);
             }

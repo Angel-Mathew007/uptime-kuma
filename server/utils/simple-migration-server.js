@@ -50,9 +50,15 @@ class SimpleMigrationServer {
         return new Promise((resolve) => {
             this.server.listen(port, hostname, () => {
                 if (hostname) {
-                    log.info("migration", `Migration server is running on http://${hostname}:${port}`);
+                    log.info(
+                        "migration",
+                        `Migration server is running on http://${hostname}:${port}`,
+                    );
                 } else {
-                    log.info("migration", `Migration server is running on http://localhost:${port}`);
+                    log.info(
+                        "migration",
+                        `Migration server is running on http://localhost:${port}`,
+                    );
                 }
                 resolve();
             });

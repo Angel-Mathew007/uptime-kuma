@@ -22,7 +22,7 @@ class YZJ extends NotificationProvider {
                 },
             };
             const params = {
-                content: msg
+                content: msg,
             };
             // yzjtype=0 => general robot
             const url = `${notification.yzjWebHookUrl}?yzjtype=0&yzjtoken=${notification.yzjToken}`;
@@ -30,7 +30,10 @@ class YZJ extends NotificationProvider {
 
             const result = await axios.post(url, params, config);
             if (!result.data?.success) {
-                throw new Error(result.data?.errmsg ?? "yzj's server did not respond with the expected result");
+                throw new Error(
+                    result.data?.errmsg ??
+                        "yzj's server did not respond with the expected result",
+                );
             }
             return okMsg;
         } catch (error) {

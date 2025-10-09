@@ -20,25 +20,46 @@ let allowedList = [];
 let lastAutoDetectChromeExecutable = null;
 
 if (process.platform === "win32") {
-    allowedList.push(process.env.LOCALAPPDATA + "\\Google\\Chrome\\Application\\chrome.exe");
-    allowedList.push(process.env.PROGRAMFILES + "\\Google\\Chrome\\Application\\chrome.exe");
-    allowedList.push(process.env["ProgramFiles(x86)"] + "\\Google\\Chrome\\Application\\chrome.exe");
+    allowedList.push(
+        process.env.LOCALAPPDATA + "\\Google\\Chrome\\Application\\chrome.exe",
+    );
+    allowedList.push(
+        process.env.PROGRAMFILES + "\\Google\\Chrome\\Application\\chrome.exe",
+    );
+    allowedList.push(
+        process.env["ProgramFiles(x86)"] +
+            "\\Google\\Chrome\\Application\\chrome.exe",
+    );
 
     // Allow Chromium too
-    allowedList.push(process.env.LOCALAPPDATA + "\\Chromium\\Application\\chrome.exe");
-    allowedList.push(process.env.PROGRAMFILES + "\\Chromium\\Application\\chrome.exe");
-    allowedList.push(process.env["ProgramFiles(x86)"] + "\\Chromium\\Application\\chrome.exe");
+    allowedList.push(
+        process.env.LOCALAPPDATA + "\\Chromium\\Application\\chrome.exe",
+    );
+    allowedList.push(
+        process.env.PROGRAMFILES + "\\Chromium\\Application\\chrome.exe",
+    );
+    allowedList.push(
+        process.env["ProgramFiles(x86)"] +
+            "\\Chromium\\Application\\chrome.exe",
+    );
 
     // Allow MS Edge
-    allowedList.push(process.env["ProgramFiles(x86)"] + "\\Microsoft\\Edge\\Application\\msedge.exe");
+    allowedList.push(
+        process.env["ProgramFiles(x86)"] +
+            "\\Microsoft\\Edge\\Application\\msedge.exe",
+    );
 
     // For Loop A to Z
     for (let i = 65; i <= 90; i++) {
         let drive = String.fromCharCode(i);
-        allowedList.push(drive + ":\\Program Files\\Google\\Chrome\\Application\\chrome.exe");
-        allowedList.push(drive + ":\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe");
+        allowedList.push(
+            drive + ":\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+        );
+        allowedList.push(
+            drive +
+                ":\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+        );
     }
-
 } else if (process.platform === "linux") {
     allowedList = [
         "chromium",
@@ -48,7 +69,7 @@ if (process.platform === "win32") {
         "/usr/bin/chromium",
         "/usr/bin/chromium-browser",
         "/usr/bin/google-chrome",
-        "/snap/bin/chromium",           // Ubuntu
+        "/snap/bin/chromium", // Ubuntu
     ];
 } else if (process.platform === "darwin") {
     allowedList = [
@@ -64,7 +85,10 @@ if (process.platform === "win32") {
  */
 async function isAllowedChromeExecutable(executablePath) {
     console.log(config.args);
-    if (config.args["allow-all-chrome-exec"] || process.env.UPTIME_KUMA_ALLOW_ALL_CHROME_EXEC === "1") {
+    if (
+        config.args["allow-all-chrome-exec"] ||
+        process.env.UPTIME_KUMA_ALLOW_ALL_CHROME_EXEC === "1"
+    ) {
         return true;
     }
 
@@ -102,7 +126,10 @@ async function getBrowser() {
  */
 async function getRemoteBrowser(remoteBrowserID, userId) {
     let remoteBrowser = await RemoteBrowser.get(remoteBrowserID, userId);
-    log.debug("MONITOR", `Using remote browser: ${remoteBrowser.name} (${remoteBrowser.id})`);
+    log.debug(
+        "MONITOR",
+        `Using remote browser: ${remoteBrowser.name} (${remoteBrowser.id})`,
+    );
     browser = await chromium.connect(remoteBrowser.url);
     return browser;
 }
@@ -114,7 +141,10 @@ async function getRemoteBrowser(remoteBrowserID, userId) {
  */
 async function prepareChromeExecutable(executablePath) {
     // Special code for using the playwright_chromium
-    if (typeof executablePath === "string" && executablePath.toLocaleLowerCase() === "#playwright_chromium") {
+    if (
+        typeof executablePath === "string" &&
+        executablePath.toLocaleLowerCase() === "#playwright_chromium"
+    ) {
         // Set to undefined = use playwright_chromium
         executablePath = undefined;
     } else if (!executablePath) {
@@ -122,37 +152,57 @@ async function prepareChromeExecutable(executablePath) {
             executablePath = "/usr/bin/chromium";
 
             // Install chromium in container via apt install
-            if ( !commandExistsSync(executablePath)) {
+            if (!commandExistsSync(executablePath)) {
                 await new Promise((resolve, reject) => {
                     log.info("Chromium", "Installing Chromium...");
-                    let child = childProcess.exec("apt update && apt --yes --no-install-recommends install chromium fonts-indic fonts-noto fonts-noto-cjk");
+                    let child = childProcess.exec(
+                        "apt update && apt --yes --no-install-recommends install chromium fonts-indic fonts-noto fonts-noto-cjk",
+                    );
 
                     // On exit
                     child.on("exit", (code) => {
-                        log.info("Chromium", "apt install chromium exited with code " + code);
+                        log.info(
+                            "Chromium",
+                            "apt install chromium exited with code " + code,
+                        );
 
                         if (code === 0) {
                             log.info("Chromium", "Installed Chromium");
-                            let version = childProcess.execSync(executablePath + " --version").toString("utf8");
-                            log.info("Chromium", "Chromium version: " + version);
+                            let version = childProcess
+                                .execSync(executablePath + " --version")
+                                .toString("utf8");
+                            log.info(
+                                "Chromium",
+                                "Chromium version: " + version,
+                            );
                             resolve();
                         } else if (code === 100) {
-                            reject(new Error("Installing Chromium, please wait..."));
+                            reject(
+                                new Error(
+                                    "Installing Chromium, please wait...",
+                                ),
+                            );
                         } else {
-                            reject(new Error("apt install chromium failed with code " + code));
+                            reject(
+                                new Error(
+                                    "apt install chromium failed with code " +
+                                        code,
+                                ),
+                            );
                         }
                     });
                 });
             }
-
         } else {
             executablePath = findChrome(allowedList);
         }
     } else {
         // User specified a path
         // Check if the executablePath is in the list of allowed
-        if (!await isAllowedChromeExecutable(executablePath)) {
-            throw new Error("This Chromium executable path is not allowed by default. If you are sure this is safe, please add an environment variable UPTIME_KUMA_ALLOW_ALL_CHROME_EXEC=1 to allow it.");
+        if (!(await isAllowedChromeExecutable(executablePath))) {
+            throw new Error(
+                "This Chromium executable path is not allowed by default. If you are sure this is safe, please add an environment variable UPTIME_KUMA_ALLOW_ALL_CHROME_EXEC=1 to allow it.",
+            );
         }
     }
     return executablePath;
@@ -178,7 +228,9 @@ function findChrome(executables) {
             return executable;
         }
     }
-    throw new Error("Chromium not found, please specify Chromium executable path in the settings page.");
+    throw new Error(
+        "Chromium not found, please specify Chromium executable path in the settings page.",
+    );
 }
 
 /**
@@ -229,14 +281,15 @@ async function testRemoteBrowser(remoteBrowserURL) {
     }
 }
 class RealBrowserMonitorType extends MonitorType {
-
     name = "real-browser";
 
     /**
      * @inheritdoc
      */
     async check(monitor, heartbeat, server) {
-        const browser = monitor.remote_browser ? await getRemoteBrowser(monitor.remote_browser, monitor.user_id) : await getBrowser();
+        const browser = monitor.remote_browser
+            ? await getRemoteBrowser(monitor.remote_browser, monitor.user_id)
+            : await getBrowser();
         const context = await browser.newContext();
         const page = await context.newPage();
 
@@ -245,7 +298,9 @@ class RealBrowserMonitorType extends MonitorType {
         // https://github.com/louislam/uptime-kuma/security/advisories/GHSA-2qgm-m29m-cj2h
         let url = new URL(monitor.url);
         if (url.protocol !== "http:" && url.protocol !== "https:") {
-            throw new Error("Invalid url protocol, only http and https are allowed.");
+            throw new Error(
+                "Invalid url protocol, only http and https are allowed.",
+            );
         }
 
         const res = await page.goto(monitor.url, {

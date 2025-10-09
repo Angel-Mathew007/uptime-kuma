@@ -1,5 +1,12 @@
 <template>
-    <span class="badge rounded-pill" :class=" 'bg-' + color ">{{ text }}</span>
+    <span
+        class="badge rounded-pill"
+        :class="'bg-' + computedColor"
+        :title="computedText"
+        :aria-label="'Monitor status: ' + computedText"
+    >
+        {{ computedText }}
+    </span>
 </template>
 
 <script>
@@ -9,55 +16,46 @@ export default {
         status: {
             type: Number,
             default: 0,
-        }
+        },
+        /** Optional custom color mapping */
+        statusColorMap: {
+            type: Object,
+            default: () => ({
+                0: "danger",      // Down
+                1: "primary",     // Up
+                2: "warning",     // Pending
+                3: "maintenance", // Maintenance
+                unknown: "secondary",
+            }),
+        },
+        /** Optional custom text mapping */
+        statusTextMap: {
+            type: Object,
+            default: () => ({
+                0: "Down",
+                1: "Up",
+                2: "Pending",
+                3: "Maintenance",
+                unknown: "Unknown",
+            }),
+        },
     },
 
     computed: {
-        color() {
-            if (this.status === 0) {
-                return "danger";
-            }
-
-            if (this.status === 1) {
-                return "primary";
-            }
-
-            if (this.status === 2) {
-                return "warning";
-            }
-
-            if (this.status === 3) {
-                return "maintenance";
-            }
-
-            return "secondary";
+        computedColor() {
+            return this.statusColorMap[this.status] || this.statusColorMap.unknown;
         },
 
-        text() {
-            if (this.status === 0) {
-                return this.$t("Down");
-            }
-
-            if (this.status === 1) {
-                return this.$t("Up");
-            }
-
-            if (this.status === 2) {
-                return this.$t("Pending");
-            }
-
-            if (this.status === 3) {
-                return this.$t("statusMaintenance");
-            }
-
-            return this.$t("Unknown");
+        computedText() {
+            return this.statusTextMap[this.status] || this.statusTextMap.unknown;
         },
     },
 };
 </script>
 
 <style scoped>
-    span {
-        min-width: 64px;
-    }
+span {
+    min-width: 64px;
+    text-align: center;
+}
 </style>

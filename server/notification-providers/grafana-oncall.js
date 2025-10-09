@@ -23,7 +23,11 @@ class GrafanaOncall extends NotificationProvider {
                     message: msg,
                     state: "alerting",
                 };
-                await axios.post(notification.GrafanaOncallURL, grafanaupdata, config);
+                await axios.post(
+                    notification.GrafanaOncallURL,
+                    grafanaupdata,
+                    config,
+                );
                 return okMsg;
             } else if (heartbeatJSON["status"] === DOWN) {
                 let grafanadowndata = {
@@ -31,7 +35,11 @@ class GrafanaOncall extends NotificationProvider {
                     message: heartbeatJSON["msg"],
                     state: "alerting",
                 };
-                await axios.post(notification.GrafanaOncallURL, grafanadowndata, config);
+                await axios.post(
+                    notification.GrafanaOncallURL,
+                    grafanadowndata,
+                    config,
+                );
                 return okMsg;
             } else if (heartbeatJSON["status"] === UP) {
                 let grafanaupdata = {
@@ -39,13 +47,16 @@ class GrafanaOncall extends NotificationProvider {
                     message: heartbeatJSON["msg"],
                     state: "ok",
                 };
-                await axios.post(notification.GrafanaOncallURL, grafanaupdata, config);
+                await axios.post(
+                    notification.GrafanaOncallURL,
+                    grafanaupdata,
+                    config,
+                );
                 return okMsg;
             }
         } catch (error) {
             this.throwGeneralAxiosError(error);
         }
-
     }
 }
 

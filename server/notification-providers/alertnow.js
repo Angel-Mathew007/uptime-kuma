@@ -16,7 +16,10 @@ class AlertNow extends NotificationProvider {
             let textMsg = "";
             let status = "open";
             let eventType = "ERROR";
-            let eventId = new Date().toISOString().slice(0, 10).replace(/-/g, "");
+            let eventId = new Date()
+                .toISOString()
+                .slice(0, 10)
+                .replace(/-/g, "");
 
             if (heartbeatJSON && heartbeatJSON.status === UP) {
                 textMsg = `[${heartbeatJSON.name}] ✅ Application is back online`;
@@ -35,10 +38,10 @@ class AlertNow extends NotificationProvider {
             }
 
             const data = {
-                "summary": textMsg,
-                "status": status,
-                "event_type": eventType,
-                "event_id": eventId,
+                summary: textMsg,
+                status: status,
+                event_type: eventType,
+                event_id: eventId,
             };
 
             let config = this.getAxiosConfigWithProxy({});
@@ -48,7 +51,6 @@ class AlertNow extends NotificationProvider {
         } catch (error) {
             this.throwGeneralAxiosError(error);
         }
-
     }
 }
 
