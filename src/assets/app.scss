@@ -649,3 +649,19 @@ $shadow-box-padding: 20px;
 // Localization
 
 @import "localization.scss";
+@media (max-width: 480px) {
+  nav .dropdown-menu {
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
+
+  nav .tab-list {
+    flex-wrap: wrap;
+  }
+
+  nav .dropdown-toggle {
+    white-space: nowrap;
+    max-width: 140px;
+    text-overflow: ellipsis;
+  }
+}
